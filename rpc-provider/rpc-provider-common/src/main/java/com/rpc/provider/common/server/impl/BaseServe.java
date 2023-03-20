@@ -4,6 +4,9 @@ import com.rpc.protocal.handler.RpcCode;
 import com.rpc.provider.common.handler.ConnectionHandler;
 import com.rpc.provider.common.handler.RpcProviderHandler;
 import com.rpc.provider.common.server.api.Server;
+import com.rpc.register.api.RegistryService;
+import com.rpc.register.api.config.RegistryConfig;
+import com.rpc.register.zookeeper.ZookeeperRegistryService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -27,8 +30,17 @@ public class BaseServe implements Server {
     private ServerBootstrap bootstrap;
     private NioEventLoopGroup boss;
     private NioEventLoopGroup work;
+
+    private RegistryService registryService;
     protected Map<String, Object> handlermap;
     public BaseServe(){}
+
+    public BaseServe(RegistryConfig registryConfig) throws Exception {
+        if("zookeeper".equals(registryConfig.getRegisterType())){
+            registryService = new ZookeeperRegistryService();
+            registryService.init(registryConfig);
+        }
+    }
 
     public BaseServe(String host, int port){
         this.host = host;

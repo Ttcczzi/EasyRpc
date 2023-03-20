@@ -14,4 +14,20 @@ public class RegistryConfig implements Serializable {
         this.registerAddress = registerAddress;
         this.registerType = registerType;
     }
+
+    public String getRegisterAddress() {
+        return registerAddress;
+    }
+
+    public void setRegisterAddress(String registerAddress) {
+        this.registerAddress = registerAddress;
+    }
+
+    public String getRegisterType() {
+        return registerType;
+    }
+
+    public void setRegisterType(String registerType) {
+        this.registerType = registerType;
+    }
 }

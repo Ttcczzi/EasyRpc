@@ -3,7 +3,9 @@ package com.rpc.register.api;
 import com.rpc.protocal.meta.ServiceMeta;
 import com.rpc.register.api.config.RegistryConfig;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author xcx
@@ -11,15 +13,17 @@ import java.io.Serializable;
  */
 public interface RegistryService {
 
-    void regsitry(ServiceMeta serviceMeta);
+    void regsitry(ServiceMeta serviceMeta) throws Exception;
 
-    void unRegistry(Serializable serializable);
+    void unRegistry(ServiceMeta serviceMeta) throws Exception;
 
-    ServiceMeta discover(String serviceName, int invokerHashCode);
+    ServiceMeta discover(String serviceName, int invokerHashCode) throws Exception;
 
-    void restory();
+    List<String> showAllServices(String serviceName) throws Exception;
 
-    default void init(RegistryConfig registryConfig){
+    void restory() throws IOException;
+
+    default void init(RegistryConfig registryConfig) throws Exception {
 
     }
 }

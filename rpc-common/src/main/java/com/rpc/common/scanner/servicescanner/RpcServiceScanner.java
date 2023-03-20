@@ -38,6 +38,7 @@ public class RpcServiceScanner extends ClassCanner {
 
                     String key = ObjectUtils.isEmpty(interfaceClass)? rpcService.interfaceName() : interfaceClass.getName();
                     key = key.concat(rpcService.version()).concat(rpcService.group());
+
                     handlerMap.put(key, aClass.newInstance());
                 }
             } catch (ClassNotFoundException e) {

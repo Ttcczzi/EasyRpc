@@ -17,7 +17,6 @@ import java.util.concurrent.ExecutionException;
  * @date
  */
 public class SendRequest implements Consumer {
-
     private static Channel channel;
     private SendRequest(){
 
