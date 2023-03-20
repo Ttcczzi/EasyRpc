@@ -29,7 +29,8 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocal<
         if(rpcFuture != null){
             String error = message.getError();
             if(error != null){
-                throw new RuntimeException(error);
+
+                throw new RuntimeException(error + " " + message.getResult());
             }
             rpcFuture.Done(protocal);
         }

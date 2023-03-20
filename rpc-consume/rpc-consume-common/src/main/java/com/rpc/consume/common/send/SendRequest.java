@@ -1,5 +1,6 @@
 package com.rpc.consume.common.send;
 
+import com.rpc.consume.common.connection.Connections;
 import com.rpc.protocal.RpcProtocal;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.message.RequestMessage;
@@ -9,6 +10,7 @@ import com.rpc.proxy.api.future.ResponesFutures;
 import com.rpc.proxy.api.future.RpcFuture;
 import io.netty.channel.Channel;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -17,15 +19,29 @@ import java.util.concurrent.ExecutionException;
  * @date
  */
 public class SendRequest implements Consumer {
-    private static Channel channel;
+    private  Channel channel;
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
     private SendRequest(){
 
     }
 
-    private static SendRequest sendRequest = new SendRequest();
+    private static ConcurrentHashMap<String, SendRequest> sendRequestPool = new ConcurrentHashMap();
 
-    public static SendRequest instance(Channel targetcChannel){
-        channel = targetcChannel;
+
+    public static SendRequest instance(String host, int port){
+        String key = host.concat(":").concat(String.valueOf(port));
+        if(sendRequestPool.contains(key)){
+            return sendRequestPool.get(key);
+        }
+        //线程安全问题
+        SendRequest sendRequest = new SendRequest();
+        sendRequest.setChannel(new Connections().tryConnect(host, port));
+        sendRequestPool.putIfAbsent(key, sendRequest);
+
         return sendRequest;
     }
 

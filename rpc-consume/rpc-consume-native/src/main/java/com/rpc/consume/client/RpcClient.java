@@ -37,16 +37,15 @@ public class RpcClient {
 
     public <T> T getSyncProxy(Class<T> interfaceClass) {
         //给被代理的接口生成配置
-        RpcConsume instance = RpcConsume.initConfig(new ProxyConfig(interfaceClass));
-        return (T) instance.getProxyService(interfaceClass);
+        return (T) RpcConsume.getInstance().getProxyService(interfaceClass);
     }
 
     public <T> AsyncProxy getAsyncProxy(Class<T> interfaceClass) {
-        return RpcConsume.getAsyncProxyService(interfaceClass);
+        return RpcConsume.getAsyncProxyService(interfaceClass, "127.0.0.1", 1106);
     }
 
     public <T> AsyncProxy getAsyncProxy(Class<T> interfaceClass, AsyncCallback callback) {
-        return RpcConsume.getAsyncProxyService(interfaceClass, callback);
+        return RpcConsume.getAsyncProxyService(interfaceClass, callback, "127.0.0.1", 1106);
     }
 
     public void close() {

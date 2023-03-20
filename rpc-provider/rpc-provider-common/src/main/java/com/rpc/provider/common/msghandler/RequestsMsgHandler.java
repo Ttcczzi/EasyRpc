@@ -1,8 +1,10 @@
 package com.rpc.provider.common.msghandler;
 
 import com.rpc.common.constant.RpcConstants;
+import com.rpc.common.utils.RpcServiceHelper;
 import com.rpc.protocal.enumeration.RpcType;
 import com.rpc.protocal.message.RequestMessage;
+import com.rpc.provider.common.handler.RpcProviderHandler;
 import com.rpc.provider.common.invokeways.ReflactWay;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -21,7 +23,7 @@ public class RequestsMsgHandler {
     public static void handlerMessage(ChannelHandlerContext ctx, RequestMessage message, Long requestId, Map<String, Object> handlerMap){
 
         String interfaceName = message.getInterfaceName();
-        String key = interfaceName.concat(message.getVersion()).concat(message.getGroup());
+        String key = RpcServiceHelper.buildServiceKey(interfaceName, message.getVersion(), message.getGroup());
         if(!handlerMap.containsKey(key)){
             ctx.channel().
                     writeAndFlush(RpcResponse.createErrorProtocal(RpcConstants.JDKSERIALIZATION, RpcType.RESPONSE.getType(), requestId, "the interface \'" + key + "\' not fount"));

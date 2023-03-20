@@ -17,7 +17,9 @@ import java.util.concurrent.ExecutionException;
  * @date
  */
 public class Consume {
-    public static void main(String[] args) throws NoSuchMethodException, ExecutionException, InterruptedException {
+    public static void main(String[] args) throws Exception {
+        RpcConsume.serviceDiscovery("com.rpc.test.consume");
+
         RpcClient rpcClient = new RpcClient();
         DemoInterface demoInterface = rpcClient.getSyncProxy(DemoInterface.class);
         String test = demoInterface.test();

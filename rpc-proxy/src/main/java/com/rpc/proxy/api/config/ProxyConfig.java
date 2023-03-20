@@ -45,10 +45,6 @@ public class ProxyConfig<T> implements Serializable {
      */
     private String serializationType;
 
-    /**
-     * 方法回调
-     */
-    private AsyncCallback callback;
 
     private boolean async;
 
@@ -58,8 +54,18 @@ public class ProxyConfig<T> implements Serializable {
         this.interfaceClass = interfaceClass;
 
         this.version = "1.0.0";
-        this.group = "";
+        this.group = "default";
         this.serializationType = "jdk";
+    }
+
+    public ProxyConfig(Class<T> interfaceClass, String version, String group, long outTime, String serializationType, boolean async, boolean oneway) {
+        this.interfaceClass = interfaceClass;
+        this.version = version;
+        this.group = group;
+        this.outTime = outTime;
+        this.serializationType = serializationType;
+        this.async = async;
+        this.oneway = oneway;
     }
 
     public Class<T> getInterfaceClass() {
@@ -126,11 +132,5 @@ public class ProxyConfig<T> implements Serializable {
         this.oneway = oneway;
     }
 
-    public void setCallback(AsyncCallback callback) {
-        this.callback = callback;
-    }
 
-    public AsyncCallback getCallback() {
-        return callback;
-    }
 }

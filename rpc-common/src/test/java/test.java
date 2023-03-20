@@ -21,7 +21,7 @@ public class test {
         Map<String, Object> classesByRpcService = rpcServiceScanner.getClassesByRpcService("com.rpc.demo");
 
 
-        Map<String, Object> classesByRpcReference = rpcReferenceScanner.getClassesByRpcReference("com.rpc.demo");
+
 
     }
 }

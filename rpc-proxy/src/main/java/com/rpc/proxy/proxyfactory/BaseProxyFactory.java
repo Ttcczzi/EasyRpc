@@ -25,7 +25,7 @@ public abstract class BaseProxyFactory<T> implements ProxyFactory {
     @Override
     public <T> void init(ProxyConfig<T> proxyConfig) {
         this.proxyObjectHandler = new ProxyObjectHandler<>(proxyConfig.isAsync(), proxyConfig.isOneway(),
-                proxyConfig.getCallback(), proxyConfig.getInterfaceClass(), proxyConfig.getVersion(),
+                null, proxyConfig.getInterfaceClass(), proxyConfig.getVersion(),
                 proxyConfig.getGroup(), proxyConfig.getConsumer());
     }
 

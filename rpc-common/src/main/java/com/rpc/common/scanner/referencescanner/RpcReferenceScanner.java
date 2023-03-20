@@ -1,7 +1,9 @@
 package com.rpc.common.scanner.referencescanner;
 
 import com.rpc.annotation.RpcReference;
+import com.rpc.common.referenceinfo.ReferenceInfo;
 import com.rpc.common.scanner.ClassCanner;
+import com.rpc.common.utils.RpcServiceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +22,8 @@ import java.util.Map;
 public class RpcReferenceScanner extends ClassCanner {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcReferenceScanner.class);
 
-    public Map<String, Object> getClassesByRpcReference(String packageName) throws IOException {
-        HashMap<String, Object> handlerMap = new HashMap<>();
+    public Map<Class<?>, ReferenceInfo> getClassesByRpcReference(String packageName) throws IOException {
+        HashMap<Class<?>, ReferenceInfo> handlerMap = new HashMap<>();
 
         List<String> classNames = super.getClassNames(packageName);
 
@@ -41,6 +43,14 @@ public class RpcReferenceScanner extends ClassCanner {
                         LOGGER.info("group===>>> " + rpcReference.group());
                         LOGGER.info("registryType===>>> " + rpcReference.registryCenterType());
                         LOGGER.info("registryAddress===>>> " + rpcReference.registryAddress());
+
+                        ReferenceInfo referenceInfo = new ReferenceInfo();
+                        referenceInfo.setVersion(rpcReference.version());
+                        referenceInfo.setGroup(rpcReference.group());
+                        referenceInfo.setRegistryAddress(rpcReference.registryAddress());
+                        referenceInfo.setRegistryCenterType(rpcReference.registryCenterType());
+
+                        handlerMap.put(field.getType(), referenceInfo);
                     }
 
                 });

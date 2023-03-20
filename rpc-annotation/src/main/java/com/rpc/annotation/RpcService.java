@@ -34,5 +34,5 @@ public @interface RpcService {
     /**
      * 服务的分组
      */
-    String group() default "";
+    String group() default "default";
 }

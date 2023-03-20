@@ -1,7 +1,9 @@
 package com.rpc.common.scanner.servicescanner;
 
 import com.rpc.annotation.RpcService;
+import com.rpc.common.exception.ServiceExceeption;
 import com.rpc.common.scanner.ClassCanner;
+import com.rpc.common.utils.RpcServiceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
@@ -13,6 +15,7 @@ import java.util.Map;
 
 /**
  * 扫描 带有@RpcService注解的类
+ *
  * @author xcx
  * @date
  */
@@ -29,15 +32,25 @@ public class RpcServiceScanner extends ClassCanner {
             try {
                 aClass = Class.forName(className);
                 RpcService rpcService = aClass.getAnnotation(RpcService.class);
-                if (rpcService != null){
+                if (rpcService != null) {
                     LOGGER.info(className + "=============================");
                     LOGGER.info(rpcService.interfaceClass().toString());
                     LOGGER.info(rpcService.interfaceName());
 
                     Class<?> interfaceClass = rpcService.interfaceClass();
 
-                    String key = ObjectUtils.isEmpty(interfaceClass)? rpcService.interfaceName() : interfaceClass.getName();
-                    key = key.concat(rpcService.version()).concat(rpcService.group());
+                    String serviceName = interfaceClass.equals(Void.class) ? rpcService.interfaceName() : interfaceClass.getName();
+
+                    if(serviceName == null || serviceName == ""){
+                        throw new ServiceExceeption("serviceName: " + serviceName + "，服务名称不合法");
+                    }
+
+                    String key =
+                            RpcServiceHelper.buildServiceKey(
+                                    serviceName,
+                                    rpcService.version(),
+                                    rpcService.group());
+
 
                     handlerMap.put(key, aClass.newInstance());
                 }

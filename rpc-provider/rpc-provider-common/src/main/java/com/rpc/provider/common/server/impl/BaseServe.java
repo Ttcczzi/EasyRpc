@@ -6,14 +6,12 @@ import com.rpc.provider.common.handler.RpcProviderHandler;
 import com.rpc.provider.common.server.api.Server;
 import com.rpc.register.api.RegistryService;
 import com.rpc.register.api.config.RegistryConfig;
-import com.rpc.register.zookeeper.ZookeeperRegistryService;
+import com.rpc.register.factory.RegistryFacotry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,24 +23,21 @@ import java.util.Map;
  */
 public class BaseServe implements Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseServe.class);
-    private String host = "127.0.0.1";
-    private int port = 1106;
+    protected String host = "127.0.0.1";
+    protected int port = 1106;
     private ServerBootstrap bootstrap;
     private NioEventLoopGroup boss;
     private NioEventLoopGroup work;
 
-    private RegistryService registryService;
+    protected RegistryService registryService;
     protected Map<String, Object> handlermap;
     public BaseServe(){}
 
     public BaseServe(RegistryConfig registryConfig) throws Exception {
-        if("zookeeper".equals(registryConfig.getRegisterType())){
-            registryService = new ZookeeperRegistryService();
-            registryService.init(registryConfig);
-        }
+        this.registryService = RegistryFacotry.getRegistryImpl(registryConfig);
     }
 
-    public BaseServe(String host, int port){
+    public BaseServe(String host, int port, RegistryConfig registryConfig){
         this.host = host;
         this.port = port;
     }

@@ -25,7 +25,7 @@ public @interface RpcReference {
     /**
      * 分组
      */
-    String group() default "";
+    String group() default "default";
 
     /**
      * 注册中心的类型
@@ -35,7 +35,7 @@ public @interface RpcReference {
     /**
      * 注册中心的地址
      */
-    String registryAddress() default "127.0.0.1:1106";
+    String registryAddress() default "127.0.0.1";
 
     /**
      * 序列化类型
