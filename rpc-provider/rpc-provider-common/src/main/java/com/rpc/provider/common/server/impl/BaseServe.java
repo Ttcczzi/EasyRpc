@@ -15,6 +15,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,43 +31,55 @@ public class BaseServe implements Server {
     private NioEventLoopGroup work;
 
     protected RegistryService registryService;
-    protected Map<String, Object> handlermap;
+    protected Map<String, Object> handlermap = new HashMap<>();
     public BaseServe(){}
+
+
 
     public BaseServe(RegistryConfig registryConfig) throws Exception {
         this.registryService = RegistryFacotry.getRegistryImpl(registryConfig);
     }
 
-    public BaseServe(String host, int port, RegistryConfig registryConfig){
+    public BaseServe(String host, int port, RegistryConfig registryConfig) throws Exception {
+        this(registryConfig);
         this.host = host;
         this.port = port;
     }
 
     @Override
-    public void startNettyServe() {
-        boss = new NioEventLoopGroup(2);
-        work = new NioEventLoopGroup();
-        try{
-            bootstrap = new ServerBootstrap()
-                    .group(boss, work)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<NioSocketChannel>() {
-                        @Override
-                        protected void initChannel(NioSocketChannel channel) throws Exception {
-                            channel.pipeline().addLast(new RpcCode());
-                            //入站
-                            channel.pipeline().addLast(new ConnectionHandler());
-                            channel.pipeline().addLast(new RpcProviderHandler(handlermap));
-                        }
-                    });
-            ChannelFuture future = bootstrap.bind(host, port).sync();
-            LOGGER.info("Server started on {}:{}", host, port);
-            future.channel().closeFuture().sync();
-        }catch (Exception e){
-            LOGGER.info("Server started error {}", e);
-        }finally {
-            work.shutdownGracefully();
-            boss.shutdownGracefully();
-        }
+    public void startNettyServe()  {
+        Thread thread = new Thread(() -> {
+            boss = new NioEventLoopGroup();
+            work = new NioEventLoopGroup();
+            try {
+                bootstrap = new ServerBootstrap()
+                        .group(boss, work)
+                        .channel(NioServerSocketChannel.class)
+                        .childHandler(new ChannelInitializer<NioSocketChannel>() {
+                            @Override
+                            protected void initChannel(NioSocketChannel channel) throws Exception {
+                                channel.pipeline().addLast(new RpcCode());
+                                //入站
+                                channel.pipeline().addLast(new ConnectionHandler());
+                                channel.pipeline().addLast(new RpcProviderHandler(handlermap));
+                            }
+                        })
+                        .option(ChannelOption.SO_BACKLOG, 128)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true);
+
+                ChannelFuture future = bootstrap.bind(host, port).sync();
+                LOGGER.info("Server started on {}:{}", host, port);
+                future.channel().closeFuture().sync();
+            } catch (Exception e) {
+                LOGGER.info("Server started error {}", e);
+            } finally {
+                work.shutdownGracefully();
+                boss.shutdownGracefully();
+            }
+        });
+        thread.start();
+
+
+
     }
 }

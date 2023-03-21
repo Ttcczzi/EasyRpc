@@ -16,6 +16,7 @@
         <module>rpc-consume</module>
         <module>rpc-proxy</module>
         <module>rpc-register</module>
+        <module>rpc-spring-boot-starter</module>
     </modules>
 
     <packaging>pom</packaging>

@@ -3,19 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>esayRpc</artifactId>
+        <artifactId>rpc-provider</artifactId>
         <groupId>com.wt</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>rpc-provider</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>rpc-provider-common</module>
-        <module>rpc-provider-native</module>
-        <module>rpc-provider-spring</module>
-    </modules>
+    <artifactId>rpc-provider-spring</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>com.wt</groupId>
+            <artifactId>rpc-provider-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

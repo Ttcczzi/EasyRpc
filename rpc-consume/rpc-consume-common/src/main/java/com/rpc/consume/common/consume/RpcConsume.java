@@ -1,10 +1,9 @@
 package com.rpc.consume.common.consume;
 
-import com.rpc.annotation.RpcReference;
 import com.rpc.common.referenceinfo.ReferenceInfo;
 import com.rpc.common.scanner.referencescanner.RpcReferenceScanner;
 import com.rpc.common.utils.RpcServiceHelper;
-import com.rpc.consume.common.connection.Connections;
+import com.rpc.consume.common.connection.ConnectionsPoll;
 import com.rpc.consume.common.send.SendRequest;
 import com.rpc.protocal.meta.ServiceMeta;
 import com.rpc.proxy.api.callback.AsyncCallback;
@@ -17,49 +16,39 @@ import com.rpc.register.api.RegistryService;
 import com.rpc.register.api.config.RegistryConfig;
 import com.rpc.register.factory.RegistryFacotry;
 
-import java.io.IOException;
-import java.rmi.registry.Registry;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 消费者
- *
+ * 消费者 ——包括扫描包，服务发现，建立连接，生成代理，返回代理实例
  * @author xcx
  * @date
  */
-public class RpcConsume {
+public abstract class RpcConsume {
 
-    private static Connections connections = new Connections();
-    private static ProxyFactory proxyFactory = new JdkProxyFactory<>();
+    protected static ConnectionsPoll connectionsPoll = new ConnectionsPoll();
+    protected static ProxyFactory proxyFactory = new JdkProxyFactory<>();
+    //代理对象实例集合
+    protected static ConcurrentHashMap<String, Object> proxyObjects = new ConcurrentHashMap<>();
 
-    private static ConcurrentHashMap<String, Object> proxyObjects = new ConcurrentHashMap<>();
 
-    private static class inner {
-        static RpcConsume rpcConsume = new RpcConsume();
-
-    }
-
-    public static RpcConsume getInstance(){
-        return inner.rpcConsume;
-    }
-
-    public static void serviceDiscovery(String packageName) throws Exception {
+    public void serviceDiscovery(String packageName) throws Exception {
         //扫描包
-
         Map<Class<?>, ReferenceInfo> reference =
                 new RpcReferenceScanner().getClassesByRpcReference(packageName);
+
         //服务发现
         for (Class<?> interfaceClass : reference.keySet()) {
+            //获得注解里的信息
             ReferenceInfo referenceInfo = reference.get(interfaceClass);
-
+            //获得用来注册服务的具体类 --zookeeper
             RegistryService registryImpl = RegistryFacotry.getRegistryImpl(new RegistryConfig(referenceInfo.getRegistryAddress(), referenceInfo.getRegistryCenterType()));
-
+            //服务名称
             String serviceName = RpcServiceHelper.buildServiceKey(interfaceClass.getName(), referenceInfo.getVersion(), referenceInfo.getGroup());
-
+            //远程服务的信息
             ServiceMeta discover = registryImpl.discover(serviceName, 0);
 
-            //重置代理工厂
+            //重置代理工厂的配置
             initConfig(new ProxyConfig(interfaceClass,
                     referenceInfo.getVersion(), referenceInfo.getGroup(),
                     referenceInfo.getOutTime(), referenceInfo.getSerializationtype(), referenceInfo.isAsync(), referenceInfo.isOneway()), discover.getAddress(), discover.getPort());
@@ -68,21 +57,27 @@ public class RpcConsume {
         }
     }
 
-    public static RpcConsume initConfig(ProxyConfig proxyConfig, String host, int port) {
+    public void serviceDiscovery(){}
+
+    /**
+     * 重置代理工厂的配置
+     * @param proxyConfig
+     * @param host
+     * @param port
+     * @return
+     */
+    protected void initConfig(ProxyConfig proxyConfig, String host, int port) {
+        //根据host与port获得远程服务调用工具类
         SendRequest sendRequest = getRemoteAddress(host, port);
 
         proxyConfig.setConsumer(sendRequest);
         proxyFactory.init(proxyConfig);
-        return inner.rpcConsume;
     }
 
     public static SendRequest getRemoteAddress(String host, int port) {
         return SendRequest.instance(host, port);
     }
 
-    private RpcConsume() {
-
-    }
 
     public <T> T getProxyService(Class<T> interfaceClass, String version, String group) {
         String serviceName = RpcServiceHelper.buildServiceKey(interfaceClass.getName(), version, group);
@@ -94,6 +89,7 @@ public class RpcConsume {
         return (T)proxyObjects.get(serviceName);
     }
 
+
     public static <T> AsyncProxy getAsyncProxyService(Class<T> interfaceClass, String host, int port) {
         return new ProxyObjectHandler<>(true, false, null, interfaceClass, "1.0.0", "", getRemoteAddress(host, port));
     }
@@ -103,7 +99,7 @@ public class RpcConsume {
     }
 
     public static void close() {
-        connections.close();
+        connectionsPoll.close();
     }
 }
 

@@ -5,5 +5,5 @@ package com.rpc.provider.common.server.api;
  * @date
  */
 public interface Server {
-    void startNettyServe();
+    void startNettyServe() throws InterruptedException;
 }

@@ -13,11 +13,7 @@ public class RpcClient {
     int port;
     String host;
 
-    boolean async;
-
-    boolean oneway;
-
-    String group = "";
+    String group = "default";
 
     String version = "1.0.0";
 
@@ -35,17 +31,17 @@ public class RpcClient {
         this.port = port;
     }
 
+
     public <T> T getSyncProxy(Class<T> interfaceClass) {
-        //给被代理的接口生成配置
-        return (T) RpcConsume.getInstance().getProxyService(interfaceClass);
+        return (T) RpcNativeConsume.getInstance().getProxyService(interfaceClass);
     }
 
     public <T> AsyncProxy getAsyncProxy(Class<T> interfaceClass) {
-        return RpcConsume.getAsyncProxyService(interfaceClass, "127.0.0.1", 1106);
+        return RpcConsume.getAsyncProxyService(interfaceClass, host, port);
     }
 
     public <T> AsyncProxy getAsyncProxy(Class<T> interfaceClass, AsyncCallback callback) {
-        return RpcConsume.getAsyncProxyService(interfaceClass, callback, "127.0.0.1", 1106);
+        return RpcConsume.getAsyncProxyService(interfaceClass, callback, host, port);
     }
 
     public void close() {

@@ -1,6 +1,6 @@
 package com.rpc.consume.common.send;
 
-import com.rpc.consume.common.connection.Connections;
+import com.rpc.consume.common.connection.ConnectionsPoll;
 import com.rpc.protocal.RpcProtocal;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.message.RequestMessage;
@@ -15,31 +15,32 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * 发送消息工具类
+ *
  * @author xcx
  * @date
  */
 public class SendRequest implements Consumer {
-    private  Channel channel;
+    private Channel channel;
 
     public void setChannel(Channel channel) {
         this.channel = channel;
     }
 
-    private SendRequest(){
+    private SendRequest() {
 
     }
 
     private static ConcurrentHashMap<String, SendRequest> sendRequestPool = new ConcurrentHashMap();
 
 
-    public static SendRequest instance(String host, int port){
+    public static SendRequest instance(String host, int port) {
         String key = host.concat(":").concat(String.valueOf(port));
-        if(sendRequestPool.contains(key)){
+        if (sendRequestPool.contains(key)) {
             return sendRequestPool.get(key);
         }
-        //线程安全问题
+
         SendRequest sendRequest = new SendRequest();
-        sendRequest.setChannel(new Connections().tryConnect(host, port));
+        sendRequest.setChannel(ConnectionsPoll.getChannel(key, host, port));
         sendRequestPool.putIfAbsent(key, sendRequest);
 
         return sendRequest;
@@ -54,7 +55,7 @@ public class SendRequest implements Consumer {
         return future;
     }
 
-    public  RpcFuture sendRequestAsync(RpcProtocal<RequestMessage> protocal, AsyncCallback callback){
+    public RpcFuture sendRequestAsync(RpcProtocal<RequestMessage> protocal, AsyncCallback callback) {
         RpcFuture future = createFuture(protocal, callback);
 
         channel.writeAndFlush(protocal);
@@ -62,16 +63,16 @@ public class SendRequest implements Consumer {
         return future;
     }
 
-    public void sendRequestOneWay(RpcProtocal<RequestMessage> protocal){
+    public void sendRequestOneWay(RpcProtocal<RequestMessage> protocal) {
 
         channel.writeAndFlush(protocal);
     }
 
     private static RpcFuture createFuture(RpcProtocal<RequestMessage> protocal, AsyncCallback callback) {
         RpcFuture rpcFuture;
-        if(callback == null){
+        if (callback == null) {
             rpcFuture = new RpcFuture(protocal);
-        }else{
+        } else {
             rpcFuture = new RpcFuture(protocal, callback);
         }
 

@@ -36,6 +36,7 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
         stype = SerializationUtils.paddingString(stype);
         out.writeBytes(stype.getBytes(StandardCharsets.UTF_8));
 
+        //todo 扩展序列化方式
         Serialization serialization = getSerialization();
         Object body = msg.getMessage();
 
@@ -62,7 +63,7 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
         ByteBuf serializationTypeBuf = in.readBytes(SerializationUtils.MAX_SERIALIZATION_TYPE_COUNR);
         String serializationType = SerializationUtils.removeZero(serializationTypeBuf.toString(StandardCharsets.UTF_8));
 
-        //todo serialization后面需要扩展更多序列化方式
+        //todo 需要扩展更多序列化方式
         Serialization serialization = SerializationFactory.getSerializationByType(serializationType);
         if(serialization == null){
             throw new SerializationException("not found serialization type: " + serializationType);

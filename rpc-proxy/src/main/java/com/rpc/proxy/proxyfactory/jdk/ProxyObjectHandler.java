@@ -29,8 +29,9 @@ public class ProxyObjectHandler<T> implements InvocationHandler, AsyncProxy {
     private String version;
     private String group;
     private Consumer consumer;
-
     private String SerializationType;
+
+    private Long outTime;
 
     public ProxyObjectHandler(boolean async, boolean oneway,
                               AsyncCallback callback, Class<T> interfaceClass,

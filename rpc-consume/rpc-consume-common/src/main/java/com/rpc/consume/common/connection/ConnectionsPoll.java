@@ -6,44 +6,38 @@ import com.rpc.protocal.handler.RpcCode;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * 与提供方建立连接
+ * 连接池
+ *
  * @author xcx
  * @date
  */
-public class Connections implements RemoteConnection{
-    private static Channel channel = null;
+public class ConnectionsPoll   {
+    private static ConcurrentHashMap<String, Channel> channelsPool = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, EventLoopGroup> groups = new ConcurrentHashMap<>();
 
-    private static final Object LOCK = new Object();
+    public static Channel getChannel(String key, String address, int port) {
+        if (channelsPool.contains(key)) {
+            return channelsPool.get(key);
+        }
+        Channel channel = tryConnect(key, address, port);
 
-    // 获取唯一的 channel 对象
-    public  Channel getChannel() {
-        if (channel != null) {
-            return channel;
-        }
-        synchronized (LOCK) {
-            if (channel != null) {
-                return channel;
-            }
-            channel = tryConnect();
-            return channel;
-        }
+        return channel;
     }
 
-    private static NioEventLoopGroup group = new NioEventLoopGroup();
 
-    private static Bootstrap bootstrap;
-
-    public Channel tryConnect() {
-        return tryConnect("127.0.0.1", 1106);
-    }
-
-    public Channel tryConnect(String address, int port) {
+    private static Channel tryConnect(String key, String address, int port) {
         try {
+            NioEventLoopGroup group = new NioEventLoopGroup(1);
+
+            Bootstrap bootstrap;
             bootstrap = new Bootstrap();
             bootstrap.channel(NioSocketChannel.class);
             bootstrap.group(group);
@@ -57,10 +51,12 @@ public class Connections implements RemoteConnection{
             Channel channel = bootstrap.connect(address, port).sync().channel();
 
             channel.closeFuture().addListener(future -> {
-
                 CallBackThreadPool.shutdown();
                 group.shutdownGracefully();
             });
+
+            groups.put(key, group);
+
             return channel;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -68,7 +64,7 @@ public class Connections implements RemoteConnection{
     }
 
     public void close() {
-        if (channel != null){
+        for (Channel channel : channelsPool.values()) {
             channel.close();
         }
     }

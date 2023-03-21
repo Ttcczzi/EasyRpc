@@ -3,7 +3,7 @@ package com.rpc.proxy.api.future;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 结果管理集合
+ * Future集合
  * @author xcx
  * @date
  */
