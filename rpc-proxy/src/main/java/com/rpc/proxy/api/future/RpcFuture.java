@@ -1,10 +1,10 @@
 package com.rpc.proxy.api.future;
 
-import com.rpc.common.threadpool.CallBackThreadPool;
 import com.rpc.protocal.RpcProtocal;
 import com.rpc.protocal.message.RequestMessage;
 import com.rpc.protocal.message.ResponseMessage;
 import com.rpc.proxy.api.callback.AsyncCallback;
+import com.rpc.proxy.threadpool.CallBackThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

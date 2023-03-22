@@ -1,10 +1,11 @@
 package com.rpc.consume.common.consume;
 
+import com.rpc.common.constant.RpcConstants;
 import com.rpc.common.referenceinfo.ReferenceInfo;
 import com.rpc.common.scanner.referencescanner.RpcReferenceScanner;
 import com.rpc.common.utils.RpcServiceHelper;
 import com.rpc.consume.common.connection.ConnectionsPoll;
-import com.rpc.consume.common.send.SendRequest;
+import com.rpc.consume.common.sendrequest.SendRequest;
 import com.rpc.protocal.meta.ServiceMeta;
 import com.rpc.proxy.api.callback.AsyncCallback;
 import com.rpc.proxy.api.config.ProxyConfig;
@@ -25,8 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date
  */
 public abstract class RpcConsume {
-
-    protected static ConnectionsPoll connectionsPoll = new ConnectionsPoll();
     protected static ProxyFactory proxyFactory = new JdkProxyFactory<>();
     //代理对象实例集合
     protected static ConcurrentHashMap<String, Object> proxyObjects = new ConcurrentHashMap<>();
@@ -53,7 +52,8 @@ public abstract class RpcConsume {
                     referenceInfo.getVersion(), referenceInfo.getGroup(),
                     referenceInfo.getOutTime(), referenceInfo.getSerializationtype(), referenceInfo.isAsync(), referenceInfo.isOneway()), discover.getAddress(), discover.getPort());
 
-            proxyObjects.put(serviceName, proxyFactory.getProxy(interfaceClass));
+            Object proxy = proxyFactory.getProxy(interfaceClass);
+            proxyObjects.put(serviceName, proxy);
         }
     }
 
@@ -91,15 +91,15 @@ public abstract class RpcConsume {
 
 
     public static <T> AsyncProxy getAsyncProxyService(Class<T> interfaceClass, String host, int port) {
-        return new ProxyObjectHandler<>(true, false, null, interfaceClass, "1.0.0", "", getRemoteAddress(host, port));
+        return new ProxyObjectHandler<>(true, false, null, interfaceClass, "1.0.0", "default", getRemoteAddress(host, port), RpcConstants.JDKSERIALIZATION,5000L);
     }
 
     public static <T> AsyncProxy getAsyncProxyService(Class<T> interfaceClass, AsyncCallback callback, String host, int port) {
-        return new ProxyObjectHandler<>(true, false, callback, interfaceClass, "1.0.0", "", getRemoteAddress(host, port));
+        return new ProxyObjectHandler<>(true, false, callback, interfaceClass, "1.0.0", "default", getRemoteAddress(host, port),RpcConstants.JDKSERIALIZATION, 5000L);
     }
 
     public static void close() {
-        connectionsPoll.close();
+        ConnectionsPoll.close();
     }
 }
 

@@ -23,7 +23,7 @@ public class RpcSingleServer extends BaseServe {
         this.handlermap = RpcServiceScanner.getClassesByRpcService(scanPackage);
 
         LOGGER.info(handlermap.toString());
-        startNettyServe();
+        super.startNettyServe();
     }
 
     //整合注册中心
@@ -42,6 +42,6 @@ public class RpcSingleServer extends BaseServe {
 
             registryService.regsitry(new ServiceMeta(service[0], service[1], service[2], host, port) );
         }
-        startNettyServe();
+        super.startNettyServe();
     }
 }

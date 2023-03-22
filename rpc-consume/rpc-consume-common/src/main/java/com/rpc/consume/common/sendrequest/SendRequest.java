@@ -1,11 +1,11 @@
-package com.rpc.consume.common.send;
+package com.rpc.consume.common.sendrequest;
 
 import com.rpc.consume.common.connection.ConnectionsPoll;
 import com.rpc.protocal.RpcProtocal;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.message.RequestMessage;
 import com.rpc.proxy.api.callback.AsyncCallback;
-import com.rpc.proxy.api.consumer.Consumer;
+import com.rpc.proxy.api.send.Send;
 import com.rpc.proxy.api.future.ResponesFutures;
 import com.rpc.proxy.api.future.RpcFuture;
 import io.netty.channel.Channel;
@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutionException;
  * @author xcx
  * @date
  */
-public class SendRequest implements Consumer {
+public class SendRequest implements Send {
     private Channel channel;
 
     public void setChannel(Channel channel) {
@@ -31,11 +31,11 @@ public class SendRequest implements Consumer {
     }
 
     private static ConcurrentHashMap<String, SendRequest> sendRequestPool = new ConcurrentHashMap();
-
+    //private static HashMap<String, SendRequest> sendRequestPool = new HashMap();
 
     public static SendRequest instance(String host, int port) {
         String key = host.concat(":").concat(String.valueOf(port));
-        if (sendRequestPool.contains(key)) {
+        if (sendRequestPool.containsKey(key)) {
             return sendRequestPool.get(key);
         }
 

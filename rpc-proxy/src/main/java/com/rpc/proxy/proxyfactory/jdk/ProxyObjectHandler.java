@@ -1,13 +1,12 @@
 package com.rpc.proxy.proxyfactory.jdk;
 
-import com.rpc.common.constant.RpcConstants;
 import com.rpc.protocal.RpcProtocal;
 import com.rpc.protocal.enumeration.RpcType;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.header.RpcHeaderFactory;
 import com.rpc.protocal.message.RequestMessage;
 import com.rpc.proxy.api.callback.AsyncCallback;
-import com.rpc.proxy.api.consumer.Consumer;
+import com.rpc.proxy.api.send.Send;
 import com.rpc.proxy.api.future.RpcFuture;
 import com.rpc.proxy.async.AsyncProxy;
 import org.slf4j.Logger;
@@ -28,34 +27,35 @@ public class ProxyObjectHandler<T> implements InvocationHandler, AsyncProxy {
     private Class<T> interfaceClass;
     private String version;
     private String group;
-    private Consumer consumer;
-    private String SerializationType;
+    private Send send;
+    private String serializationType;
 
     private Long outTime;
 
     public ProxyObjectHandler(boolean async, boolean oneway,
                               AsyncCallback callback, Class<T> interfaceClass,
-                              String version, String group, Consumer consumer) {
+                              String version, String group, Send send, String serializationType, Long outTime) {
         this.async = async;
         this.oneway = oneway;
         this.callback = callback;
         this.interfaceClass = interfaceClass;
         this.version = version;
         this.group = group;
-        this.consumer = consumer;
+        this.send = send;
+        this.serializationType = serializationType;
+        this.outTime = outTime;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         RpcProtocal<RequestMessage> protocal = createProtocal(interfaceClass, method.getName(), method.getParameterTypes(), args, group, version);
-        RpcFuture rpcFuture = consumer.sendRequestSync(protocal, callback);
+        RpcFuture rpcFuture = send.sendRequestSync(protocal, callback);
 
         if (rpcFuture != null && rpcFuture.isDone()) {
             return rpcFuture.get();
         }
 
         return null;
-
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ProxyObjectHandler<T> implements InvocationHandler, AsyncProxy {
         RpcProtocal<RequestMessage> protocal = createProtocal(interfaceClass, methodName, method.getParameterTypes(), args, group, version);
         RpcFuture rpcFuture = null;
         try{
-            rpcFuture = consumer.sendRequestAsync(protocal, callback);
+            rpcFuture = send.sendRequestAsync(protocal, callback);
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }
@@ -75,7 +75,7 @@ public class ProxyObjectHandler<T> implements InvocationHandler, AsyncProxy {
     private RpcProtocal<RequestMessage> createProtocal(Class<?> interfaceClass, String methodName, Class<?>[] paramsTypes, Object[] args, String group, String version) {
         RpcProtocal<RequestMessage> protocal = new RpcProtocal<>();
 
-        RpcHeader requestHeader = RpcHeaderFactory.getRequestHeader(RpcConstants.JDKSERIALIZATION, RpcType.REQUEST.getType());
+        RpcHeader requestHeader = RpcHeaderFactory.getRequestHeader(serializationType, RpcType.REQUEST.getType());
         Long id = requestHeader.getRequestId();
 
         RequestMessage requestMessage = new RequestMessage();
@@ -140,19 +140,19 @@ public class ProxyObjectHandler<T> implements InvocationHandler, AsyncProxy {
         this.group = group;
     }
 
-    public Consumer getConsumer() {
-        return consumer;
+    public Send getConsumer() {
+        return send;
     }
 
-    public void setConsumer(Consumer consumer) {
-        this.consumer = consumer;
+    public void setConsumer(Send send) {
+        this.send = send;
     }
 
     public String getSerializationType() {
-        return SerializationType;
+        return serializationType;
     }
 
     public void setSerializationType(String serializationType) {
-        SerializationType = serializationType;
+        serializationType = serializationType;
     }
 }

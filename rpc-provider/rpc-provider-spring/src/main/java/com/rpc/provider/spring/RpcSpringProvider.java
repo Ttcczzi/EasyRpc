@@ -20,7 +20,7 @@ import java.util.Map;
  * @author xcx
  * @date
  */
-public class RpcSpringProvider extends BaseServe implements ApplicationContextAware, InitializingBean {
+public class  RpcSpringProvider extends BaseServe implements ApplicationContextAware, InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcSpringProvider.class);
 
     public RpcSpringProvider(String host, int port, String registerAddress, String registerType) throws Exception {
@@ -77,7 +77,7 @@ public class RpcSpringProvider extends BaseServe implements ApplicationContextAw
                 }
             }
 
-            startNettyServe();
+            super.startNettyServe();
         }
     }
 }

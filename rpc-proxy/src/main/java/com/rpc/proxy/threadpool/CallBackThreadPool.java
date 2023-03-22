@@ -1,4 +1,4 @@
-package com.rpc.common.threadpool;
+package com.rpc.proxy.threadpool;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -26,6 +26,8 @@ public class CallBackThreadPool {
     }
 
     public static void shutdown(){
-        executor.shutdown();
+        if (!executor.isShutdown()){
+            executor.shutdown();
+        }
     }
 }

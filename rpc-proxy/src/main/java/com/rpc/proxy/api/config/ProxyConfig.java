@@ -1,8 +1,7 @@
 package com.rpc.proxy.api.config;
 
-import com.rpc.proxy.api.callback.AsyncCallback;
-import com.rpc.proxy.api.consumer.Consumer;
-import com.rpc.serializatiion.Serialization;
+import com.rpc.common.constant.RpcConstants;
+import com.rpc.proxy.api.send.Send;
 
 import java.io.Serializable;
 
@@ -38,7 +37,7 @@ public class ProxyConfig<T> implements Serializable {
     /**
      * 消费者接口
      */
-    private Consumer consumer;
+    private Send send;
 
     /**
      * 序列化类型
@@ -55,7 +54,7 @@ public class ProxyConfig<T> implements Serializable {
 
         this.version = "1.0.0";
         this.group = "default";
-        this.serializationType = "jdk";
+        this.serializationType = RpcConstants.JDKSERIALIZATION;
     }
 
     public ProxyConfig(Class<T> interfaceClass, String version, String group, long outTime, String serializationType, boolean async, boolean oneway) {
@@ -100,12 +99,12 @@ public class ProxyConfig<T> implements Serializable {
         this.outTime = outTime;
     }
 
-    public Consumer getConsumer() {
-        return consumer;
+    public Send getConsumer() {
+        return send;
     }
 
-    public void setConsumer(Consumer consumer) {
-        this.consumer = consumer;
+    public void setConsumer(Send send) {
+        this.send = send;
     }
 
     public String getSerializationType() {

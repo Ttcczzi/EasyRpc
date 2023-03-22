@@ -45,8 +45,15 @@ public class RpcReferenceScanner extends ClassCanner {
                         LOGGER.info("registryAddress===>>> " + rpcReference.registryAddress());
 
                         ReferenceInfo referenceInfo = new ReferenceInfo();
+
                         referenceInfo.setVersion(rpcReference.version());
                         referenceInfo.setGroup(rpcReference.group());
+                        referenceInfo.setOutTime(rpcReference.outTime());
+                        referenceInfo.setAsync(rpcReference.async());
+                        referenceInfo.setOneway(rpcReference.oneway());
+                        referenceInfo.setLoadBlanceType(rpcReference.loadBlanceType());
+                        referenceInfo.setProxytype(referenceInfo.getProxytype());
+                        referenceInfo.setSerializationtype(rpcReference.serializationtype());
                         referenceInfo.setRegistryAddress(rpcReference.registryAddress());
                         referenceInfo.setRegistryCenterType(rpcReference.registryCenterType());
 

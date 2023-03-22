@@ -40,7 +40,7 @@ public @interface RpcReference {
     /**
      * 序列化类型
      */
-    String serializationtype() default "protostuff";
+    String serializationtype() default "jdk";
 
     /**
      * 负载均衡方式

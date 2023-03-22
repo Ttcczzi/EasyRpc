@@ -11,16 +11,32 @@ import org.springframework.context.annotation.Configuration;
  * @date
  */
 @Configuration
+@ConfigurationProperties("easyrpc.consume")
 public class RpcSpringClientAutoConfig {
-    @Bean
-    @ConfigurationProperties(prefix = "easyrpc.consume")
-    public RpcSpringClientConfig rpcSpringClientConfig() {
-        return new RpcSpringClientConfig();
-    }
+
+    private String regsitryAddress = "127.0.0.1";
+
+    private String registryType = "zookeeper";
 
     @Bean
-    public RpcSpringComsume rpcSpringComsume(final RpcSpringClientConfig rpcSpringClientConfig) throws Exception {
+    public RpcSpringComsume rpcSpringComsume() throws Exception {
         return
-                new RpcSpringComsume(rpcSpringClientConfig.getRegisterAddress(), rpcSpringClientConfig.getRegisterType());
+                new RpcSpringComsume(regsitryAddress, registryType);
+    }
+
+    public String getRegsitryAddress() {
+        return regsitryAddress;
+    }
+
+    public void setRegsitryAddress(String regsitryAddress) {
+        this.regsitryAddress = regsitryAddress;
+    }
+
+    public String getRegisterType() {
+        return registryType;
+    }
+
+    public void setRegisterType(String registryType) {
+        this.registryType = registryType;
     }
 }

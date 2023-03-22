@@ -11,21 +11,43 @@ import org.springframework.context.annotation.Configuration;
  * @author xcx
  * @date
  */
+
 @Configuration
+@ConfigurationProperties("easyrpc.provider")
 public class RpcSpringServerAutoConfig {
 
+    private String host = "127.0.0.1";
+    private String regsitryAddress = "127.0.0.1";
+    private String registryType = "zookeeper";
+
     @Bean
-    @ConfigurationProperties(prefix = "easyrpc.provider")
-    public RpcSpringServerConfig rpcSpringServerConfig(){
-        return new RpcSpringServerConfig();
+    public RpcSpringProvider rpcSpringProviderServer() throws Exception {
+        return
+                new RpcSpringProvider(host ,1106 ,
+                        regsitryAddress, registryType);
     }
 
-    @Value("server.port")
-    String port;
+    public String getHost() {
+        return host;
+    }
 
-    @Bean
-    public RpcSpringProvider rpcSpringProviderServer(final RpcSpringServerConfig rpcSpringServerConfig) throws Exception {
-        return
-                new RpcSpringProvider(rpcSpringServerConfig.getHost() ,1106 ,rpcSpringServerConfig.getRegisterAddress(), rpcSpringServerConfig.getRegisterType());
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getRegsitryAddress() {
+        return regsitryAddress;
+    }
+
+    public void setRegsitryAddress(String regsitryAddress) {
+        this.regsitryAddress = regsitryAddress;
+    }
+
+    public String getRegisterType() {
+        return registryType;
+    }
+
+    public void setRegisterType(String registryType) {
+        this.registryType = registryType;
     }
 }

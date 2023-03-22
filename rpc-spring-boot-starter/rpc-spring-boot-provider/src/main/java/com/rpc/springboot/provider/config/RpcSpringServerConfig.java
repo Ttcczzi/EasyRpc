@@ -1,14 +1,17 @@
 package com.rpc.springboot.provider.config;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
 /**
  * @author xcx
  * @date
  */
+
 public class RpcSpringServerConfig {
     private String host = "127.0.0.1";
-    private String regsitryAddress = "127.0.0.1";
-
-    private String registerType = "zookeeper";
+    private String regsitryAddress ;
+    private String registerType;
 
     public RpcSpringServerConfig() {
     }

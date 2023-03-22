@@ -9,7 +9,10 @@ import java.io.*;
  * @author xcx
  * @date
  */
-public class JdkSerilization implements Serialization {
+public enum JdkSerilization implements Serialization {
+
+    JDK_SERILIZATION();
+
     @Override
     public <T> byte[] serialize(T obj)  {
         if(obj == null){

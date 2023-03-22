@@ -25,15 +25,16 @@ import java.util.Map;
 public class BaseServe implements Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseServe.class);
     protected String host = "127.0.0.1";
-    protected int port = 1106;
+    protected int port = 9999;
     private ServerBootstrap bootstrap;
     private NioEventLoopGroup boss;
     private NioEventLoopGroup work;
 
     protected RegistryService registryService;
     protected Map<String, Object> handlermap = new HashMap<>();
-    public BaseServe(){}
 
+    public BaseServe() {
+    }
 
 
     public BaseServe(RegistryConfig registryConfig) throws Exception {
@@ -47,8 +48,9 @@ public class BaseServe implements Server {
     }
 
     @Override
-    public void startNettyServe()  {
-        Thread thread = new Thread(() -> {
+    public void startNettyServe() {
+        new Thread(() -> {
+
             boss = new NioEventLoopGroup();
             work = new NioEventLoopGroup();
             try {
@@ -76,10 +78,6 @@ public class BaseServe implements Server {
                 work.shutdownGracefully();
                 boss.shutdownGracefully();
             }
-        });
-        thread.start();
-
-
-
+        }).start();
     }
 }

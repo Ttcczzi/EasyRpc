@@ -523,4 +523,16 @@ public class RpcReferenceBean implements FactoryBean<Object> {
     public void setExceptionPostProcessorType(String exceptionPostProcessorType) {
         this.exceptionPostProcessorType = exceptionPostProcessorType;
     }
+
+    public Class<?> getInterfaceClass() {
+        return interfaceClass;
+    }
+
+    public void setOutTime(long outTime) {
+        this.outTime = outTime;
+    }
+
+    public void setObject(Object object) {
+        this.object = object;
+    }
 }

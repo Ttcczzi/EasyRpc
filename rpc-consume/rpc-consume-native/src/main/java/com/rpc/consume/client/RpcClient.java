@@ -1,5 +1,6 @@
 package com.rpc.consume.client;
 
+import com.rpc.common.constant.RpcConstants;
 import com.rpc.consume.common.consume.RpcConsume;
 import com.rpc.proxy.api.callback.AsyncCallback;
 import com.rpc.proxy.api.config.ProxyConfig;
@@ -17,7 +18,7 @@ public class RpcClient {
 
     String version = "1.0.0";
 
-    String serializationtype = "jdk";
+    String serializationtype = RpcConstants.JDKSERIALIZATION;
 
     long outTime = 5000;
 

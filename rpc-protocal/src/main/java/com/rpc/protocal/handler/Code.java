@@ -10,6 +10,6 @@ import com.rpc.serializatiion.impl.JdkSerilization;
  */
 public interface Code {
     default Serialization getSerialization(){
-        return new JdkSerilization();
+        return null;
     }
 }

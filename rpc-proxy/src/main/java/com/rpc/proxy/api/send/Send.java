@@ -1,4 +1,4 @@
-package com.rpc.proxy.api.consumer;
+package com.rpc.proxy.api.send;
 
 import com.rpc.protocal.RpcProtocal;
 import com.rpc.protocal.message.RequestMessage;
@@ -7,7 +7,7 @@ import com.rpc.proxy.api.future.RpcFuture;
 
 import java.util.concurrent.ExecutionException;
 
-public interface Consumer {
+public interface Send {
     /**
      * 消费者发送 request 请求
      */

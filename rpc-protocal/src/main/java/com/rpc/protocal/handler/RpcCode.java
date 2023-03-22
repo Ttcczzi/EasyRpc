@@ -11,6 +11,8 @@ import com.rpc.protocal.message.ResponseMessage;
 import com.rpc.serializatiion.Serialization;
 import com.rpc.serializatiion.SerializationFactory;
 import com.rpc.serializatiion.exeception.SerializationException;
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
@@ -18,12 +20,14 @@ import io.netty.handler.codec.ByteToMessageCodec;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+
 /**
  * 通信协议的解码与编码器
  * @author xcx
  * @date
  */
 public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements Code {
+    private static Logger LOGGER = LoggerFactory.getLogger(RpcCode.class);
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcProtocal msg, ByteBuf out) throws Exception {
         RpcHeader header = msg.getHeader();
@@ -32,13 +36,19 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
         out.writeByte(header.getStatus());
         out.writeLong(header.getRequestId());
 
-        String stype = header.getSerializationType();
-        stype = SerializationUtils.paddingString(stype);
-        out.writeBytes(stype.getBytes(StandardCharsets.UTF_8));
+        String serializationType = header.getSerializationType();
 
         //todo 扩展序列化方式
-        Serialization serialization = getSerialization();
+        Serialization serialization = SerializationFactory.getSerializationByType(serializationType);
+        if(serialization == null){
+            LOGGER.error("not found serialization type: " + serializationType);
+
+            serialization = SerializationFactory.getSerializationByType("jdk");
+        }
         Object body = msg.getMessage();
+
+        serializationType = SerializationUtils.paddingString(serializationType);
+        out.writeBytes(serializationType.getBytes(StandardCharsets.UTF_8));
 
         byte[] data = serialization.serialize(body);
         out.writeInt(data.length);
@@ -66,7 +76,8 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
         //todo 需要扩展更多序列化方式
         Serialization serialization = SerializationFactory.getSerializationByType(serializationType);
         if(serialization == null){
-            throw new SerializationException("not found serialization type: " + serializationType);
+            LOGGER.error("not found serialization type: " + serializationType);
+            serialization = SerializationFactory.getSerializationByType("jdk");
         }
 
         int dataLen = in.readInt();

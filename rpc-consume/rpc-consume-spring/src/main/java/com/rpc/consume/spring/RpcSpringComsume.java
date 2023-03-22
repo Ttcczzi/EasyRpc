@@ -2,6 +2,7 @@ package com.rpc.consume.spring;
 
 import com.rpc.annotation.RpcReference;
 import com.rpc.annotation.RpcService;
+import com.rpc.common.constant.RpcConstants;
 import com.rpc.common.referenceinfo.ReferenceInfo;
 import com.rpc.common.utils.RpcServiceHelper;
 import com.rpc.consume.common.consume.RpcConsume;
@@ -48,9 +49,16 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
 
     private final Map<String, BeanDefinition> rpcRefBeanDefinitionMap = new LinkedHashMap<>();
 
+    RegistryService registryImpl;
     public RpcSpringComsume(String regsitryAddress, String registryType) {
         this.regsitryAddress = regsitryAddress;
         this.registryType = registryType;
+
+        try {
+            registryImpl = RegistryFacotry.getRegistryImpl(new RegistryConfig(regsitryAddress, registryType));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -71,6 +79,7 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         String[] names = beanFactory.getBeanDefinitionNames();
+
         for(String beanName: names){
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
             String beanClassName = beanDefinition.getBeanClassName();
@@ -96,26 +105,33 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
     private void filedsHandler(Field field)  {
         try {
             RpcReference annotation = field.getAnnotation(RpcReference.class);
-            RegistryService registryImpl = RegistryFacotry.getRegistryImpl(new RegistryConfig(regsitryAddress, registryType));
+
 
             if (annotation != null){
-                String interfaceClassName = field.getClass().getName();
+                String interfaceClassName = field.getType().getName();
                 String version = annotation.version();
                 String group = annotation.group();
                 //服务名称
-                String serviceName = RpcServiceHelper.buildServiceKey(interfaceClassName, version, version);
-                //远程服务的信息
+                String serviceName = RpcServiceHelper.buildServiceKey(interfaceClassName, version, group);
+                //服务发现
+                //todo 扩展
                 ServiceMeta discover = registryImpl.discover(serviceName, 0);
 
+                if(discover == null){
+                    LOGGER.error("the service " + interfaceClassName + " not found in registryCenter!");
+                    return;
+                }
+
                 //重置代理工厂的配置
-                initConfig(new ProxyConfig(field.getClass(),
-                        version, group,
-                        annotation.outTime(), annotation.serializationtype(), annotation.async(), annotation.oneway()), discover.getAddress(), discover.getPort());
+                initConfig(new ProxyConfig(field.getType(),
+                        version, group, annotation.outTime(), annotation.serializationtype(),
+                        annotation.async(), annotation.oneway()), discover.getAddress(), discover.getPort());
 
                 Object proxy = proxyFactory.getProxy(field.getType());
 
                 BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(RpcReferenceBean.class);
-                //todo 扩展
+                builder.setInitMethodName("init");
+                //todo 扩展属性
                 builder.addPropertyValue("interfaceClass", field.getType());
                 builder.addPropertyValue("version", version);
                 builder.addPropertyValue("group", group);
@@ -123,10 +139,11 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
                 builder.addPropertyValue("serializationType", annotation.serializationtype());
                 builder.addPropertyValue("async", annotation.async());
                 builder.addPropertyValue("oneway", annotation.oneway());
+                builder.addPropertyValue("object", proxy);
 
                 BeanDefinition beanDefinition = builder.getBeanDefinition();
 
-                rpcRefBeanDefinitionMap.put(interfaceClassName, beanDefinition);
+                rpcRefBeanDefinitionMap.put(field.getName(), beanDefinition);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

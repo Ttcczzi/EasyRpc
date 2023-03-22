@@ -16,4 +16,5 @@ public class RpcNativeConsume extends RpcConsume {
     public static RpcNativeConsume getInstance(){
         return inner.consume;
     }
+
 }

@@ -1,2 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
- com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig

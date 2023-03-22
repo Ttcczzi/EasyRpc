@@ -32,6 +32,8 @@ public class Consume {
         String wt = testInterface.test("wt");
         System.out.println(wt);
 
+        RpcConsume.close();
+
 //        RpcClient rpcClient = new RpcClient();
 //        AsyncProxy asyncProxy = rpcClient.getAsyncProxy(DemoInterface.class, new AsyncCallback() {
 //            @Override
