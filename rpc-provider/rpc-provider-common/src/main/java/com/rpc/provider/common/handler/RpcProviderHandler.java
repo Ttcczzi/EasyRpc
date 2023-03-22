@@ -36,7 +36,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocal<
         byte msgType = header.getMsgType();
         Object message = protocal.getMessage();
         if(msgType == 1 && message instanceof RequestMessage){
-            RequestsMsgHandler.handlerMessage(ctx, (RequestMessage) message, header.getRequestId(), handlermap);
+            RequestsMsgHandler.handlerMessage(ctx, (RequestMessage) message, protocal.getHeader(), header.getRequestId(), handlermap);
         }
     }
 
