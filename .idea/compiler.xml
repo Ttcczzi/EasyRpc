@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="interfaces" />
+        <module name="rpc-common" />
+        <module name="rpc-serialization" />
+        <module name="rpc-spring-boot-provider" />
+        <module name="rpc-provider-common" />
+        <module name="rpc-proxy" />
+        <module name="consume" />
+        <module name="rpc-protocal" />
+        <module name="rpc-zclient" />
+        <module name="rpc-consume-common" />
+        <module name="rpc-consume-spring" />
+        <module name="rpc-provider-native" />
+        <module name="rpc-provider-spring" />
+        <module name="provider" />
+        <module name="rpc-annotation" />
+        <module name="rpc-consume-native" />
+        <module name="rpc-spring-boot-consume" />
+        <module name="rpc-register" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="consumer" target="1.8" />
+      <module name="rpc-connections" target="1.8" />
+      <module name="rpc-demo" target="1.8" />
+      <module name="rpoc" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="esayRpc" options="" />
+      <module name="rpc-annotation" options="" />
+      <module name="rpc-demo" options="-parameters" />
+    </option>
+  </component>
+</project>

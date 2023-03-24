@@ -1,0 +1,11 @@
+com\rpc\test\interfaces\DemoInterface.class
+com\rpc\test\consume\Reference.class
+com\rpc\test\interfaces\TestInterface.class
+com\rpc\test\Main$1.class
+com\rpc\test\provider\DemoImpl.class
+com\rpc\test\provider\TestInterfaceImpl.class
+com\rpc\test\Main.class
+com\rpc\test\consume\Consume.class
+com\rpc\test\provider\Server.class
+com\rpc\test\register\ZookeeperRegisterTest.class
+com\rpc\test\Main$1$1.class

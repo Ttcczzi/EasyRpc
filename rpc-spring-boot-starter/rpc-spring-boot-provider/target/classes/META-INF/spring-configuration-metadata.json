@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "name": "easyrpc.provider",
+      "type": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig",
+      "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "easyrpc.provider.host",
+      "type": "java.lang.String",
+      "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
+    },
+    {
+      "name": "easyrpc.provider.register-type",
+      "type": "java.lang.String",
+      "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
+    },
+    {
+      "name": "easyrpc.provider.regsitry-address",
+      "type": "java.lang.String",
+      "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
+    }
+  ],
+  "hints": []
+}

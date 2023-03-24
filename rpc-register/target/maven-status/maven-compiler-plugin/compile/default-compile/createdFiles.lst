@@ -1,0 +1,4 @@
+com\rpc\register\factory\RegistryFacotry.class
+com\rpc\register\api\config\RegistryConfig.class
+com\rpc\register\api\RegistryService.class
+com\rpc\register\zookeeper\ZookeeperRegistryService.class

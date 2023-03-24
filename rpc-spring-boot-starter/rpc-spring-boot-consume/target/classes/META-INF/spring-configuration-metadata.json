@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "easyrpc.consume",
+      "type": "com.rpc.springboot.consume.autoconfig.RpcSpringClientAutoConfig",
+      "sourceType": "com.rpc.springboot.consume.autoconfig.RpcSpringClientAutoConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "easyrpc.consume.register-type",
+      "type": "java.lang.String",
+      "sourceType": "com.rpc.springboot.consume.autoconfig.RpcSpringClientAutoConfig"
+    },
+    {
+      "name": "easyrpc.consume.regsitry-address",
+      "type": "java.lang.String",
+      "sourceType": "com.rpc.springboot.consume.autoconfig.RpcSpringClientAutoConfig"
+    }
+  ],
+  "hints": []
+}

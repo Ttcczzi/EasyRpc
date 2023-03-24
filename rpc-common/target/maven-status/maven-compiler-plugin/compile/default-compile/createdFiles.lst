@@ -1,0 +1,10 @@
+com\rpc\common\constant\RpcConstants.class
+com\rpc\common\id\IdFactory.class
+com\rpc\common\scanner\servicescanner\RpcServiceScanner.class
+com\rpc\common\utils\RpcServiceHelper.class
+com\rpc\common\referenceinfo\ReferenceInfo.class
+com\rpc\common\scanner\ClassCanner.class
+com\rpc\common\scanner\referencescanner\RpcReferenceScanner.class
+com\rpc\common\scanner\ClassCanner$1.class
+com\rpc\common\exception\ServiceExceeption.class
+com\rpc\common\utils\SerializationUtils.class
