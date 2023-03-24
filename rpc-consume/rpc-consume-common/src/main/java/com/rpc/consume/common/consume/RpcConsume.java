@@ -5,6 +5,7 @@ import com.rpc.common.referenceinfo.ReferenceInfo;
 import com.rpc.common.scanner.referencescanner.RpcReferenceScanner;
 import com.rpc.common.utils.RpcServiceHelper;
 import com.rpc.consume.common.connection.ConnectionsPoll;
+import com.rpc.consume.common.heartbeat.HeartBeatFixedTime;
 import com.rpc.consume.common.sendrequest.SendRequest;
 import com.rpc.protocal.meta.ServiceMeta;
 import com.rpc.proxy.api.callback.AsyncCallback;
@@ -13,6 +14,7 @@ import com.rpc.proxy.async.AsyncProxy;
 import com.rpc.proxy.proxyfactory.ProxyFactory;
 import com.rpc.proxy.proxyfactory.jdk.JdkProxyFactory;
 import com.rpc.proxy.proxyfactory.jdk.ProxyObjectHandler;
+import com.rpc.proxy.threadpool.CallBackThreadPool;
 import com.rpc.register.api.RegistryService;
 import com.rpc.register.api.config.RegistryConfig;
 import com.rpc.register.factory.RegistryFacotry;
@@ -22,14 +24,29 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 消费者 ——包括扫描包，服务发现，建立连接，生成代理，返回代理实例
+ *
  * @author xcx
  * @date
  */
 public abstract class RpcConsume {
+    protected String regsitryAddress;
+
+    protected String registryType;
+
+
     protected static ProxyFactory proxyFactory = new JdkProxyFactory<>();
     //代理对象实例集合
     protected static ConcurrentHashMap<String, Object> proxyObjects = new ConcurrentHashMap<>();
 
+    protected static HeartBeatFixedTime  heartBeatFixedTime;
+    public RpcConsume(String regsitryAddress, String registryType) {
+        this.regsitryAddress = regsitryAddress;
+        this.registryType = registryType;
+
+        HeartBeatFixedTime heartBeatFixedTime = new HeartBeatFixedTime();
+        heartBeatFixedTime.start();
+
+    }
 
     public void serviceDiscovery(String packageName) throws Exception {
         //扫描包
@@ -57,10 +74,12 @@ public abstract class RpcConsume {
         }
     }
 
-    public void serviceDiscovery(){}
+    public void serviceDiscovery() {
+    }
 
     /**
      * 重置代理工厂的配置
+     *
      * @param proxyConfig
      * @param host
      * @param port
@@ -81,25 +100,42 @@ public abstract class RpcConsume {
 
     public <T> T getProxyService(Class<T> interfaceClass, String version, String group) {
         String serviceName = RpcServiceHelper.buildServiceKey(interfaceClass.getName(), version, group);
-        return (T)proxyObjects.get(serviceName);
+        return (T) proxyObjects.get(serviceName);
     }
 
     public <T> T getProxyService(Class<T> interfaceClass) {
         String serviceName = RpcServiceHelper.buildServiceKey(interfaceClass.getName(), "1.0.0", "default");
-        return (T)proxyObjects.get(serviceName);
+        if(!proxyObjects.containsKey(serviceName)){
+
+        }
+        return (T) proxyObjects.get(serviceName);
     }
 
 
     public static <T> AsyncProxy getAsyncProxyService(Class<T> interfaceClass, String host, int port) {
-        return new ProxyObjectHandler<>(true, false, null, interfaceClass, "1.0.0", "default", getRemoteAddress(host, port), RpcConstants.JDKSERIALIZATION,5000L);
+        return new ProxyObjectHandler<>(true, false, null, interfaceClass, "1.0.0", "default", getRemoteAddress(host, port), RpcConstants.JDKSERIALIZATION, 5000L);
     }
 
     public static <T> AsyncProxy getAsyncProxyService(Class<T> interfaceClass, AsyncCallback callback, String host, int port) {
-        return new ProxyObjectHandler<>(true, false, callback, interfaceClass, "1.0.0", "default", getRemoteAddress(host, port),RpcConstants.JDKSERIALIZATION, 5000L);
+        return new ProxyObjectHandler<>(true, false, callback, interfaceClass, "1.0.0", "default", getRemoteAddress(host, port), RpcConstants.JDKSERIALIZATION, 5000L);
     }
 
     public static void close() {
         ConnectionsPoll.close();
+
+        heartBeatFixedTime.end();
+
+        CallBackThreadPool.shutdown();
+
+    }
+
+
+    public void setRegistryType(String registryType) {
+        this.registryType = registryType;
+    }
+
+    public void setRegsitryAddress(String regsitryAddress) {
+        this.regsitryAddress = regsitryAddress;
     }
 }
 

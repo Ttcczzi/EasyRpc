@@ -63,7 +63,7 @@ public class BaseServe implements Server {
                                 channel.pipeline().addLast(new RpcCode());
                                 //入站
                                 channel.pipeline().addLast(new ConnectionHandler());
-                                channel.pipeline().addLast(new RpcProviderHandler(handlermap));
+                                channel.pipeline().addLast(new RpcProviderHandler(handlermap, host, port));
                             }
                         })
                         .option(ChannelOption.SO_BACKLOG, 128)
@@ -80,4 +80,6 @@ public class BaseServe implements Server {
             }
         }).start();
     }
+
+
 }

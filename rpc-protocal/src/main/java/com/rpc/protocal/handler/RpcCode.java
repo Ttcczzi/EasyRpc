@@ -6,17 +6,18 @@ import com.rpc.protocal.RpcProtocal;
 import com.rpc.protocal.base.RpcMessage;
 import com.rpc.protocal.enumeration.Messagetype;
 import com.rpc.protocal.header.RpcHeader;
+import com.rpc.protocal.message.HeartBeatMessage;
 import com.rpc.protocal.message.RequestMessage;
 import com.rpc.protocal.message.ResponseMessage;
 import com.rpc.serializatiion.Serialization;
 import com.rpc.serializatiion.SerializationFactory;
 import com.rpc.serializatiion.exeception.SerializationException;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -50,7 +51,13 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
         serializationType = SerializationUtils.paddingString(serializationType);
         out.writeBytes(serializationType.getBytes(StandardCharsets.UTF_8));
 
-        byte[] data = serialization.serialize(body);
+        byte[] data = null;
+        try{
+             data = serialization.serialize(body);
+        }catch (Exception e){
+            LOGGER.error(e.getMessage());
+        }
+
         out.writeInt(data.length);
         out.writeBytes(data);
     }
@@ -103,7 +110,7 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
 
         switch (msgTypeEnum){
             case REQUEST:
-                RequestMessage requestMessage = serialization.dserialize(data, RequestMessage.class);
+                RequestMessage requestMessage = serialization.deserilize(data, RequestMessage.class);
                 if(requestMessage != null){
                     RpcProtocal<RequestMessage> protocal = new RpcProtocal<>();
                     protocal.setHeader(rpcHeader);
@@ -113,7 +120,7 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
                 }
                 break;
             case RESPONSE:
-                ResponseMessage responseMessage = serialization.dserialize(data, ResponseMessage.class);
+                ResponseMessage responseMessage = serialization.deserilize(data, ResponseMessage.class);
                 if(responseMessage != null){
                     RpcProtocal<ResponseMessage> protocal = new RpcProtocal<>();
                     protocal.setHeader(rpcHeader);
@@ -122,6 +129,15 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
                     out.add(protocal);
                 }
                 break;
+            case HEARTBEAT:
+                HeartBeatMessage heartBeatMessage = serialization.deserilize(data, HeartBeatMessage.class);
+                if(heartBeatMessage != null){
+                    RpcProtocal<HeartBeatMessage> protocal = new RpcProtocal<>();
+                    protocal.setHeader(rpcHeader);
+                    protocal.setMessage(heartBeatMessage);
+
+                    out.add(protocal);
+                }
             default:
                 break;
         }

@@ -39,10 +39,6 @@ import java.util.Map;
 public class RpcSpringComsume extends RpcConsume implements ApplicationContextAware, BeanClassLoaderAware, BeanFactoryPostProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcSpringComsume.class);
 
-    private String regsitryAddress;
-
-    private String registryType;
-
     private ApplicationContext applicationContext;
 
     private ClassLoader classLoader;
@@ -51,8 +47,7 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
 
     RegistryService registryImpl;
     public RpcSpringComsume(String regsitryAddress, String registryType) {
-        this.regsitryAddress = regsitryAddress;
-        this.registryType = registryType;
+        super(regsitryAddress, registryType);
 
         try {
             registryImpl = RegistryFacotry.getRegistryImpl(new RegistryConfig(regsitryAddress, registryType));

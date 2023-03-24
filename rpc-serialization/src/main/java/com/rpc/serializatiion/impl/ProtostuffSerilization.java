@@ -1,10 +1,12 @@
 package com.rpc.serializatiion.impl;
 
-import com.dyuproject.protostuff.LinkedBuffer;
-import com.dyuproject.protostuff.ProtostuffIOUtil;
-import com.dyuproject.protostuff.Schema;
-import com.dyuproject.protostuff.runtime.RuntimeSchema;
+
 import com.rpc.serializatiion.Serialization;
+import io.protostuff.LinkedBuffer;
+import io.protostuff.ProtobufIOUtil;
+import io.protostuff.ProtostuffIOUtil;
+import io.protostuff.Schema;
+import io.protostuff.runtime.RuntimeSchema;
 import org.apache.commons.lang3.SerializationException;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
@@ -22,62 +24,44 @@ import java.util.concurrent.ConcurrentHashMap;
 public enum ProtostuffSerilization implements Serialization {
     PROTOSTUFF_SERILIZATION();
 
-    private final Logger logger = LoggerFactory.getLogger(ProtostuffSerilization.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(ProtostuffSerilization.class);
 
-    private Map<Class<?>, Schema<?>> cachedSchema = new ConcurrentHashMap<>();
-
-    private Objenesis objenesis = new ObjenesisStd(true);
+    private static LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+    //缓存Schema
+    private static Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<Class<?>, Schema<?>>();
+    //序列化方法，把指定对象序列化成字节数组
+    @SuppressWarnings("unchecked")
+    public  <T> byte[] serialize(T obj) {
+        LOGGER.info("protostuff serialize");
+        Class<T> clazz = (Class<T>) obj.getClass();
+        Schema<T> schema = getSchema(clazz);
+        byte[] data;
+        try {
+            data = ProtostuffIOUtil.toByteArray(obj, schema, buffer);
+        } finally {
+            buffer.clear();
+        }
+        return data;
+    }
+    //反序列化方法，将字节数组反序列化成指定Class类型
+    public <T> T deserilize(byte[] data, Class<T> clazz) {
+        LOGGER.info("protostuff deserilize");
+        Schema<T> schema = getSchema(clazz);
+        T obj = schema.newMessage();
+        ProtostuffIOUtil.mergeFrom(data, obj, schema);
+        return obj;
+    }
 
     @SuppressWarnings("unchecked")
-    private <T> Schema<T> getSchema(Class<T> cls) {
-        Schema<T> schema = (Schema<T>) cachedSchema.get(cls);
+    private static <T> Schema<T> getSchema(Class<T> clazz) {
+        Schema<T> schema = (Schema<T>) schemaCache.get(clazz);
         if (schema == null) {
-            schema = RuntimeSchema.createFrom(cls);
-            if (schema != null) {
-                cachedSchema.put(cls, schema);
+            schema = RuntimeSchema.getSchema(clazz);
+            if (schema == null) {
+                schemaCache.put(clazz, schema);
             }
         }
         return schema;
     }
 
-    /**
-     * 序列化（对象 -> 字节数组）
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> byte[] serialize(T obj) {
-        logger.info("execute protostuff serialize...");
-        if (obj == null){
-            throw new SerializationException("字节数组为空");
-        }
-        Class<T> cls = (Class<T>) obj.getClass();
-        LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
-        try {
-            Schema<T> schema = getSchema(cls);
-            return ProtostuffIOUtil.toByteArray(obj, schema, buffer);
-        } catch (Exception e) {
-            throw new SerializationException("字节数组为空");
-        } finally {
-            buffer.clear();
-        }
-    }
-
-    /**
-     * 反序列化（字节数组 -> 对象）
-     */
-    @Override
-    public <T> T dserialize(byte[] data, Class<T> cls) {
-        logger.info("execute protostuff deserialize...");
-        if (data == null){
-            throw new SerializationException("字节数组为空");
-        }
-        try {
-            T message = (T) objenesis.newInstance(cls);
-            Schema<T> schema = getSchema(cls);
-            ProtostuffIOUtil.mergeFrom(data, message, schema);
-            return message;
-        } catch (Exception e) {
-            throw new SerializationException("字节数组为空");
-        }
-    }
 }

@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author xcx
  * @date
  */
-public class ResponesFutures {
+public class FuturesSet {
     public static ConcurrentHashMap<Long, RpcFuture> futures= new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<Long, RpcFuture> heartBeat= new ConcurrentHashMap<>();
+
 }

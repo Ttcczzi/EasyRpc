@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
  * @date
  */
 public class ConnectionHandler extends ChannelInboundHandlerAdapter {
-
     private static final Logger LOGGER =  LoggerFactory.getLogger(ConnectionHandler.class);
 
     @Override

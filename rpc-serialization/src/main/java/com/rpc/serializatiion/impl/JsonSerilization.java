@@ -44,7 +44,7 @@ public enum JsonSerilization implements Serialization {
     }
 
     @Override
-    public <T> T dserialize(byte[] bytes, Class<T> tClass) {
+    public <T> T deserilize(byte[] bytes, Class<T> tClass) {
         LOGGER.info("JsonSerilization dserialize");
         if(bytes == null || bytes.length <= 0){
             throw new SerializationException("字节数组为空");

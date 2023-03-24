@@ -1,7 +1,6 @@
 package com.rpc.springboot.consume.autoconfig;
 
 import com.rpc.consume.spring.RpcSpringComsume;
-import com.rpc.springboot.consume.config.RpcSpringClientConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

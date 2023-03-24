@@ -7,14 +7,19 @@ import com.rpc.consume.common.consume.RpcConsume;
  * @date
  */
 public class RpcNativeConsume extends RpcConsume {
-    private RpcNativeConsume(){}
+    private RpcNativeConsume(String registryAddress, String registryType){
+        super(registryAddress, registryType);
 
-    private static class inner{
-        public static RpcNativeConsume consume = new RpcNativeConsume();
     }
 
-    public static RpcNativeConsume getInstance(){
-        return inner.consume;
+   static RpcNativeConsume rpcNativeConsume;
+
+    public static RpcNativeConsume getInstance(String registryAddress, String registryType){
+        if(rpcNativeConsume == null){
+            rpcNativeConsume = new RpcNativeConsume( registryAddress,  registryType);
+        }
+
+        return rpcNativeConsume;
     }
 
 }

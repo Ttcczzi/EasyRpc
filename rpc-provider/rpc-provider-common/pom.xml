@@ -13,12 +13,6 @@
     <dependencies>
         <dependency>
             <groupId>com.wt</groupId>
-            <artifactId>rpc-protocal</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.wt</groupId>
             <artifactId>rpc-register</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>

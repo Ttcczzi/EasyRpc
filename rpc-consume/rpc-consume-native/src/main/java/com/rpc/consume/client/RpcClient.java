@@ -11,12 +11,14 @@ import com.rpc.proxy.async.AsyncProxy;
  * @date
  */
 public class RpcClient {
-    int port;
-    String host;
+    int port = 1106;
+    String host = "127.0.0.1";
 
     String group = "default";
 
     String version = "1.0.0";
+    String registryCenter = "127.0.0.1";
+    String registryTypr = "zookeeper";
 
     String serializationtype = RpcConstants.JDKSERIALIZATION;
 
@@ -32,9 +34,12 @@ public class RpcClient {
         this.port = port;
     }
 
+    public void discovery(String packageName) throws Exception {
+        RpcNativeConsume.getInstance(registryCenter, registryTypr).serviceDiscovery(packageName);
+    }
 
     public <T> T getSyncProxy(Class<T> interfaceClass) {
-        return (T) RpcNativeConsume.getInstance().getProxyService(interfaceClass);
+        return (T) RpcNativeConsume.getInstance(registryCenter, registryTypr).getProxyService(interfaceClass);
     }
 
     public <T> AsyncProxy getAsyncProxy(Class<T> interfaceClass) {

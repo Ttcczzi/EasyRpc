@@ -2,7 +2,7 @@ package com.rpc.test;
 
 import com.rpc.common.constant.RpcConstants;
 import com.rpc.protocal.RpcProtocal;
-import com.rpc.protocal.enumeration.RpcType;
+import com.rpc.protocal.enumeration.Messagetype;
 import com.rpc.protocal.handler.RpcCode;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.header.RpcHeaderFactory;
@@ -48,7 +48,7 @@ public class Main {
         });
 
         RpcProtocal<RequestMessage> protocal = new RpcProtocal<>();
-        RpcHeader rpcHeader = RpcHeaderFactory.getRequestHeader(RpcConstants.JDKSERIALIZATION, RpcType.REQUEST.getType());
+        RpcHeader rpcHeader = RpcHeaderFactory.getRequestHeader(RpcConstants.JDKSERIALIZATION, Messagetype.REQUEST.getType());
         RequestMessage requestMessage = new RequestMessage();
         requestMessage.setGroup("");
         requestMessage.setVersion("1.0.0");

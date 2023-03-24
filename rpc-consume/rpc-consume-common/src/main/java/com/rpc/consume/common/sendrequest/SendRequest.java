@@ -1,15 +1,21 @@
 package com.rpc.consume.common.sendrequest;
 
 import com.rpc.consume.common.connection.ConnectionsPoll;
+import com.rpc.consume.common.heartbeat.HeartBeatFixedTime;
 import com.rpc.protocal.RpcProtocal;
+import com.rpc.protocal.base.RpcMessage;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.message.RequestMessage;
 import com.rpc.proxy.api.callback.AsyncCallback;
 import com.rpc.proxy.api.send.Send;
-import com.rpc.proxy.api.future.ResponesFutures;
+import com.rpc.proxy.api.future.FuturesSet;
 import com.rpc.proxy.api.future.RpcFuture;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.net.SocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -20,6 +26,11 @@ import java.util.concurrent.ExecutionException;
  * @date
  */
 public class SendRequest implements Send {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendRequest.class);
+    private static String remoteHost;
+
+    private static int remotePort;
+
     private Channel channel;
 
     public void setChannel(Channel channel) {
@@ -43,19 +54,31 @@ public class SendRequest implements Send {
         sendRequest.setChannel(ConnectionsPoll.getChannel(key, host, port));
         sendRequestPool.putIfAbsent(key, sendRequest);
 
+        remoteHost = host;
+        remotePort = port;
+
         return sendRequest;
     }
 
-    public RpcFuture sendRequestSync(RpcProtocal<RequestMessage> protocal, AsyncCallback callback) throws ExecutionException, InterruptedException {
+    public RpcFuture sendRequestSync(RpcProtocal<RpcMessage> protocal, AsyncCallback callback) throws ExecutionException, InterruptedException {
+        if (! channel.isWritable()){
+            channel = reconnect();
+        }
+
         RpcFuture future = createFuture(protocal, callback);
 
         channel.writeAndFlush(protocal);
 
         future.get();
+
         return future;
     }
 
-    public RpcFuture sendRequestAsync(RpcProtocal<RequestMessage> protocal, AsyncCallback callback) {
+    public RpcFuture sendRequestAsync(RpcProtocal<RpcMessage> protocal, AsyncCallback callback) {
+        if (! channel.isWritable()){
+            channel = reconnect();
+        }
+
         RpcFuture future = createFuture(protocal, callback);
 
         channel.writeAndFlush(protocal);
@@ -63,12 +86,15 @@ public class SendRequest implements Send {
         return future;
     }
 
-    public void sendRequestOneWay(RpcProtocal<RequestMessage> protocal) {
+    public void sendRequestOneWay(RpcProtocal<RpcMessage> protocal) {
+        if (! channel.isWritable()){
+            channel = reconnect();
+        }
 
         channel.writeAndFlush(protocal);
     }
 
-    private static RpcFuture createFuture(RpcProtocal<RequestMessage> protocal, AsyncCallback callback) {
+    public static RpcFuture createFuture(RpcProtocal<RpcMessage> protocal, AsyncCallback callback) {
         RpcFuture rpcFuture;
         if (callback == null) {
             rpcFuture = new RpcFuture(protocal);
@@ -77,8 +103,14 @@ public class SendRequest implements Send {
         }
 
         RpcHeader header = protocal.getHeader();
-        ResponesFutures.futures.put(header.getRequestId(), rpcFuture);
+        FuturesSet.futures.put(header.getRequestId(), rpcFuture);
 
         return rpcFuture;
+    }
+
+    public Channel reconnect() {
+        LOGGER.warn("the channel {}:{} try to reconnect", remoteHost, remotePort);
+        String key = remoteHost.concat(":").concat(String.valueOf(remoteHost));
+        return ConnectionsPoll.reconnect(key, remoteHost, remotePort);
     }
 }

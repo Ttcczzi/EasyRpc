@@ -1,7 +1,6 @@
 package com.rpc.springboot.provider.autoconfig;
 
 import com.rpc.provider.spring.RpcSpringProvider;
-import com.rpc.springboot.provider.config.RpcSpringServerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,15 +14,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties("easyrpc.provider")
 public class RpcSpringServerAutoConfig {
-
     private String host = "127.0.0.1";
-    private String regsitryAddress = "127.0.0.1";
+    private String port = "1106";
+    private String regsitryAddress = "127.0.0.1:2181";
     private String registryType = "zookeeper";
+
 
     @Bean
     public RpcSpringProvider rpcSpringProviderServer() throws Exception {
         return
-                new RpcSpringProvider(host ,1106 ,
+                new RpcSpringProvider(host ,Integer.parseInt(port) ,
                         regsitryAddress, registryType);
     }
 

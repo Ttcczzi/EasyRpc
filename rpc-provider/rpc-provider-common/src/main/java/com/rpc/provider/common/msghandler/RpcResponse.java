@@ -4,6 +4,7 @@ import com.rpc.common.constant.RpcConstants;
 import com.rpc.protocal.RpcProtocal;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.header.RpcHeaderFactory;
+import com.rpc.protocal.message.HeartBeatMessage;
 import com.rpc.protocal.message.ResponseMessage;
 
 /**
@@ -38,5 +39,18 @@ public class RpcResponse {
         protocal.setMessage(responseMessage);
 
         return protocal;
+    }
+
+    public static RpcProtocal createHeartBeatProtocal(String serializationType, int msgType, Long requestId, String msg){
+        RpcHeader rpcHeader = RpcHeaderFactory.getRequestHeader(serializationType, msgType, requestId);
+
+        HeartBeatMessage heartBeatMessage = new HeartBeatMessage();
+        heartBeatMessage.setResult(msg);
+
+        RpcProtocal<HeartBeatMessage> heartBeatMessageRpcProtocal = new RpcProtocal<>();
+        heartBeatMessageRpcProtocal.setHeader(rpcHeader);
+        heartBeatMessageRpcProtocal.setMessage(heartBeatMessage);
+
+        return heartBeatMessageRpcProtocal;
     }
 }

@@ -20,19 +20,13 @@ import java.util.concurrent.ExecutionException;
  */
 public class Consume {
     public static void main(String[] args) throws Exception {
-        RpcNativeConsume instance = RpcNativeConsume.getInstance();
-        instance.serviceDiscovery("com.rpc.test.consume");
-
         RpcClient rpcClient = new RpcClient();
+        rpcClient.discovery("com.rpc.test.consume");
+
         DemoInterface demoInterface = rpcClient.getSyncProxy(DemoInterface.class);
         String test = demoInterface.test();
         System.out.println(test);
 
-        TestInterface testInterface = rpcClient.getSyncProxy(TestInterface.class);
-        String wt = testInterface.test("wt");
-        System.out.println(wt);
-
-        RpcConsume.close();
 
 //        RpcClient rpcClient = new RpcClient();
 //        AsyncProxy asyncProxy = rpcClient.getAsyncProxy(DemoInterface.class, new AsyncCallback() {

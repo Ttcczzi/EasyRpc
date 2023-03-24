@@ -25,15 +25,17 @@
         </dependency>
 
         <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
+            <groupId>io.protostuff</groupId>
             <artifactId>protostuff-core</artifactId>
-            <version>${protostuff.version}</version>
+            <version>1.6.0</version>
         </dependency>
         <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
+            <groupId>io.protostuff</groupId>
             <artifactId>protostuff-runtime</artifactId>
-            <version>${protostuff.version}</version>
+            <version>1.6.0</version>
         </dependency>
+
+
     </dependencies>
 
 </project>

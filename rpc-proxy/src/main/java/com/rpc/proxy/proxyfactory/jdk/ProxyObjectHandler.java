@@ -1,7 +1,8 @@
 package com.rpc.proxy.proxyfactory.jdk;
 
 import com.rpc.protocal.RpcProtocal;
-import com.rpc.protocal.enumeration.RpcType;
+import com.rpc.protocal.base.RpcMessage;
+import com.rpc.protocal.enumeration.Messagetype;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.header.RpcHeaderFactory;
 import com.rpc.protocal.message.RequestMessage;
@@ -48,8 +49,8 @@ public class ProxyObjectHandler<T> implements InvocationHandler, AsyncProxy {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        RpcProtocal<RequestMessage> protocal = createProtocal(interfaceClass, method.getName(), method.getParameterTypes(), args, group, version);
-        RpcFuture rpcFuture = send.sendRequestSync(protocal, callback);
+        RpcProtocal<RpcMessage> protocal = createProtocal(interfaceClass, method.getName(), method.getParameterTypes(), args, group, version);
+        RpcFuture rpcFuture = send.sendRequestSync(protocal, null);
 
         if (rpcFuture != null && rpcFuture.isDone()) {
             return rpcFuture.get();
@@ -61,7 +62,7 @@ public class ProxyObjectHandler<T> implements InvocationHandler, AsyncProxy {
     @Override
     public RpcFuture call(String methodName, Object... args) throws NoSuchMethodException {
         Method method = interfaceClass.getMethod(methodName);
-        RpcProtocal<RequestMessage> protocal = createProtocal(interfaceClass, methodName, method.getParameterTypes(), args, group, version);
+        RpcProtocal<RpcMessage> protocal = createProtocal(interfaceClass, methodName, method.getParameterTypes(), args, group, version);
         RpcFuture rpcFuture = null;
         try{
             rpcFuture = send.sendRequestAsync(protocal, callback);
@@ -72,10 +73,10 @@ public class ProxyObjectHandler<T> implements InvocationHandler, AsyncProxy {
         return rpcFuture;
     }
 
-    private RpcProtocal<RequestMessage> createProtocal(Class<?> interfaceClass, String methodName, Class<?>[] paramsTypes, Object[] args, String group, String version) {
-        RpcProtocal<RequestMessage> protocal = new RpcProtocal<>();
+    private RpcProtocal<RpcMessage> createProtocal(Class<?> interfaceClass, String methodName, Class<?>[] paramsTypes, Object[] args, String group, String version) {
+        RpcProtocal<RpcMessage> protocal = new RpcProtocal<>();
 
-        RpcHeader requestHeader = RpcHeaderFactory.getRequestHeader(serializationType, RpcType.REQUEST.getType());
+        RpcHeader requestHeader = RpcHeaderFactory.getRequestHeader(serializationType, Messagetype.REQUEST.getType());
         Long id = requestHeader.getRequestId();
 
         RequestMessage requestMessage = new RequestMessage();

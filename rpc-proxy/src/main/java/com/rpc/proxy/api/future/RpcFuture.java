@@ -1,6 +1,8 @@
 package com.rpc.proxy.api.future;
 
 import com.rpc.protocal.RpcProtocal;
+import com.rpc.protocal.base.RpcMessage;
+import com.rpc.protocal.message.HeartBeatMessage;
 import com.rpc.protocal.message.RequestMessage;
 import com.rpc.protocal.message.ResponseMessage;
 import com.rpc.proxy.api.callback.AsyncCallback;
@@ -25,26 +27,31 @@ import java.util.concurrent.locks.ReentrantLock;
 public class RpcFuture extends CompletableFuture<Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcFuture.class);
     private Sync sync;
-    private RpcProtocal<RequestMessage> requestRrotocal;
-    private RpcProtocal<ResponseMessage> responseRrotocal;
+    private RpcProtocal<RpcMessage> requestRrotocal;
+    private RpcProtocal<RpcMessage> responseRrotocal;
+
     private long startTime;
     private long responseTimeThrshould = 5000;
     private ArrayList<AsyncCallback> callbackList;
 
     private ReentrantLock lock = new ReentrantLock();
 
+    public RpcFuture(){
 
-    public RpcFuture(RpcProtocal<RequestMessage> requestRrotocal) {
+    }
+
+    public RpcFuture(RpcProtocal<RpcMessage> requestRrotocal) {
         this.sync = new Sync();
         this.requestRrotocal = requestRrotocal;
         this.startTime = System.currentTimeMillis();
     }
 
-    public RpcFuture(RpcProtocal<RequestMessage> requestRrotocal, AsyncCallback callback) {
+    public RpcFuture(RpcProtocal<RpcMessage> requestRrotocal, AsyncCallback callback) {
         this(requestRrotocal);
         callbackList = new ArrayList<>();
         addCallBack(callback);
     }
+
 
     public void addCallBack(AsyncCallback callback){
         lock.lock();
@@ -105,7 +112,16 @@ public class RpcFuture extends CompletableFuture<Object> {
 
     private Object get0() {
         if (responseRrotocal != null) {
-            return responseRrotocal.getMessage().getResult();
+            RpcMessage message = responseRrotocal.getMessage();
+            if(message instanceof ResponseMessage){
+                ResponseMessage responseMessage = (ResponseMessage) responseRrotocal.getMessage();
+                return responseMessage.getResult();
+            }
+            if(message instanceof HeartBeatMessage){
+                HeartBeatMessage heartBeatMessage = (HeartBeatMessage) responseRrotocal.getMessage();
+                return heartBeatMessage.getResult();
+            }
+
         }
         return null;
     }
@@ -116,26 +132,52 @@ public class RpcFuture extends CompletableFuture<Object> {
         if (success) {
             return get0();
         } else {
-            throw new RuntimeException("time out, RequestId: " + requestRrotocal.getHeader().getRequestId()
-                    + "interfaceName: " + requestRrotocal.getMessage().getInterfaceName()
-                    + "methodName: " + requestRrotocal.getMessage().getMethodName());
+            throw new RuntimeException("time out, RequestId: " + requestRrotocal.getMessage());
         }
     }
 
-    public void Done(RpcProtocal<ResponseMessage> responseRrotocal) {
+    public void Done(RpcProtocal<RpcMessage> responseRrotocal) {
         this.responseRrotocal = responseRrotocal;
+        //唤醒正在阻塞的线程
         sync.release(1);
         invokeCallBack();
         long processTime = System.currentTimeMillis() - startTime;
         if (processTime > responseTimeThrshould) {
-            LOGGER.warn("time out: " + requestRrotocal.getMessage().getInterfaceName() + "," + requestRrotocal.getMessage().getMethodName());
+            LOGGER.warn("time out: " + responseRrotocal.getMessage());
         }
+    }
+
+
+    public RpcProtocal<RpcMessage> getRequestRrotocal() {
+        return requestRrotocal;
+    }
+
+    public void setRequestRrotocal(RpcProtocal<RpcMessage> requestRrotocal) {
+        this.requestRrotocal = requestRrotocal;
+    }
+
+    public RpcProtocal<RpcMessage> getResponseRrotocal() {
+        return responseRrotocal;
+    }
+
+    public void setResponseRrotocal(RpcProtocal<RpcMessage> responseRrotocal) {
+        this.responseRrotocal = responseRrotocal;
+    }
+
+    public long getResponseTimeThrshould() {
+        return responseTimeThrshould;
+    }
+
+    public void setResponseTimeThrshould(long responseTimeThrshould) {
+        this.responseTimeThrshould = responseTimeThrshould;
     }
 
     //该aqs没有作为锁来用，只是利用其特性来实现future的功能
     static class Sync extends AbstractQueuedSynchronizer {
 
+        //aqs状态为1表示已经获得结果
         private final int done = 1;
+        //aqs状态为0表示还未获得结果
         private final int pedding = 0;
 
         //若此时状态已经是done，说明已经获得结果，返回true，使得线程不阻塞

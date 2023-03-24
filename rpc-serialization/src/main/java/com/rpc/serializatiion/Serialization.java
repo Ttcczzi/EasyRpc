@@ -8,5 +8,5 @@ package com.rpc.serializatiion;
 public interface Serialization {
     <T> byte[] serialize(T obj);
 
-    <T> T dserialize(byte[] bytes, Class<T> tClass);
+    <T> T deserilize(byte[] bytes, Class<T> tClass);
 }

@@ -1,9 +1,11 @@
 package com.rpc.provider.common.handler;
 
 import com.rpc.protocal.RpcProtocal;
+import com.rpc.protocal.enumeration.Messagetype;
 import com.rpc.protocal.header.RpcHeader;
+import com.rpc.protocal.message.HeartBeatMessage;
 import com.rpc.protocal.message.RequestMessage;
-import com.rpc.provider.common.msghandler.RequestsMsgHandler;
+import com.rpc.provider.common.msghandler.MsgHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -23,8 +25,14 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocal<
 
     private final Map<String, Object> handlermap;
 
-    public RpcProviderHandler(Map map){
+    private String host;
+
+    private int port;
+
+    public RpcProviderHandler(Map map, String host, int port){
         this.handlermap = map;
+        this.host = host;
+        this.port = port;
     }
 
 
@@ -35,10 +43,14 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocal<
         RpcHeader header = protocal.getHeader();
         byte msgType = header.getMsgType();
         Object message = protocal.getMessage();
-        if(msgType == 1 && message instanceof RequestMessage){
-            RequestsMsgHandler.handlerMessage(ctx, (RequestMessage) message, protocal.getHeader(), header.getRequestId(), handlermap);
+
+        if(msgType == Messagetype.REQUEST.getType() && message instanceof RequestMessage){
+            MsgHandler.handlerRequestMessage(ctx, (RequestMessage) message, protocal.getHeader(), header.getRequestId(), handlermap);
+        }else if(msgType == Messagetype.HEARTBEAT.getType() && message instanceof HeartBeatMessage){
+            MsgHandler.handlerHeartBeatMessage(ctx, (HeartBeatMessage) message, protocal.getHeader(), host, port);
         }
     }
+
 
 
 }

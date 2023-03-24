@@ -10,7 +10,6 @@
         <module>rpc-common</module>
         <module>rpc-annotation</module>
         <module>rpc-provider</module>
-        <module>rpc-test</module>
         <module>rpc-protocal</module>
         <module>rpc-serialization</module>
         <module>rpc-consume</module>
@@ -23,7 +22,7 @@
     <name>esayRpc</name>
 
     <properties>
-        <string.version>5.2.20.RELEASE</string.version>
+        <springcontext.version>5.2.20.RELEASE</springcontext.version>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.21</slf4j.version>
         <logback.version>1.1.7</logback.version>
@@ -44,15 +43,11 @@
         <fst.version>2.57</fst.version>
         <protobuf.version>3.11.0</protobuf.version>
         <fastjson.version>1.2.73</fastjson.version>
-        <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
+        <spring.boot.version>2.6.11</spring.boot.version>
     </properties>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba</groupId>-->
-<!--            <artifactId>fastjson</artifactId>-->
-<!--            <version>${fastjson.version}</version>-->
-<!--        </dependency>-->
+
         <!-- SLF4J -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -61,11 +56,11 @@
         </dependency>
 
         <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${string.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework</groupId>-->
+<!--            <artifactId>spring-context</artifactId>-->
+<!--            <version>${springcontext.version}</version>-->
+<!--        </dependency>-->
 
         <!-- Netty -->
         <dependency>

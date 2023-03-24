@@ -8,7 +8,9 @@ public enum Messagetype {
     //请求消息
     REQUEST(1),
     //响应消息
-    RESPONSE(2);
+    RESPONSE(2),
+
+    HEARTBEAT(3);
 
     private final int type;
 
