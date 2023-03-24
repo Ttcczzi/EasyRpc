@@ -16,7 +16,6 @@ import javax.annotation.Resource;
  */
 @SpringBootApplication
 public class ConsumeApplication {
-
     @RpcReference
     @Resource
     private TestInterface testInterface;

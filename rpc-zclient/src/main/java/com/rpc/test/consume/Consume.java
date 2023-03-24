@@ -28,21 +28,6 @@ public class Consume {
         System.out.println(test);
 
 
-//        RpcClient rpcClient = new RpcClient();
-//        AsyncProxy asyncProxy = rpcClient.getAsyncProxy(DemoInterface.class, new AsyncCallback() {
-//            @Override
-//            public void success(RpcProtocal<ResponseMessage> protocal) {
-//                System.out.println(protocal.getMessage().getResult());
-//            }
-//
-//            @Override
-//            public void defeat(RuntimeException exception) {
-//
-//            }
-//        });
-//
-//        asyncProxy.call("test", null);
-
     }
 
 }

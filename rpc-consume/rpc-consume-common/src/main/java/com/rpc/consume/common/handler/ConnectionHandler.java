@@ -24,6 +24,7 @@ public class ConnectionHandler extends ChannelInboundHandlerAdapter {
         String key = host.concat(":").concat(String.valueOf(port));
         Channel channel = ctx.channel();
 
+        //在连接池中添加channel
         ConnectionsPoll.putChannel(key, host, port, channel);
     }
 
@@ -32,6 +33,7 @@ public class ConnectionHandler extends ChannelInboundHandlerAdapter {
         LOGGER.error("{}, {}", cause.getMessage(), ctx.channel().toString());
         String key = host.concat(":").concat(String.valueOf(port));
 
+        //删除连接池的channel
         ConnectionsPoll.disconnect(key);
     }
 }
