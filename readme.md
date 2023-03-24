@@ -8,6 +8,8 @@
 
 ### 软件架构说明
 
+![](https://toscode.gitee.com/wtatata/easy-rpc/raw/tao/rpc-zdemo/easyRpc.png)
+
 ### 使用说明
 
 在rpc-zdemo中有演示样例
