@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import java.net.SocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 发送消息工具类
@@ -62,33 +64,42 @@ public class SendRequest implements Send {
         return sendRequest;
     }
 
-    public RpcFuture sendRequestSync(RpcProtocal<RpcMessage> protocal, AsyncCallback callback) throws ExecutionException, InterruptedException {
+    public RpcFuture sendRequestSync(RpcProtocal<RpcMessage> protocal, AsyncCallback callback) throws ExecutionException, InterruptedException, TimeoutException {
         if (! channel.isWritable()){
             channel = reconnect();
         }
+        RpcFuture future = null;
+        try{
+            future = createFuture(protocal, callback);
+            channel.writeAndFlush(protocal);
+        }catch (Exception e){
+            LOGGER.error(e.getMessage());
+            LOGGER.warn("reconnecting...");
+        }
 
-        RpcFuture future = createFuture(protocal, callback);
-
-        channel.writeAndFlush(protocal);
-
-        future.get();
+        future.get(20, TimeUnit.SECONDS);
 
         return future;
     }
 
-    public RpcFuture sendRequestAsync(RpcProtocal<RpcMessage> protocal, AsyncCallback callback) {
+    public RpcFuture sendRequestAsync(RpcProtocal<RpcMessage> protocal, AsyncCallback callback) throws InterruptedException {
         if (! channel.isWritable()){
             channel = reconnect();
         }
 
-        RpcFuture future = createFuture(protocal, callback);
-
-        channel.writeAndFlush(protocal);
+        RpcFuture future = null;
+        try{
+            future = createFuture(protocal, callback);
+            channel.writeAndFlush(protocal);
+        }catch (Exception e){
+            LOGGER.error(e.getMessage());
+            LOGGER.warn("reconnecting...");
+        }
 
         return future;
     }
 
-    public void sendRequestOneWay(RpcProtocal<RpcMessage> protocal) {
+    public void sendRequestOneWay(RpcProtocal<RpcMessage> protocal) throws InterruptedException {
         if (! channel.isWritable()){
             channel = reconnect();
         }
@@ -110,9 +121,12 @@ public class SendRequest implements Send {
         return rpcFuture;
     }
 
-    public Channel reconnect() {
+    public Channel reconnect() throws InterruptedException {
+        //todo
         LOGGER.warn("the channel {}:{} try to reconnect", remoteHost, remotePort);
         String key = remoteHost.concat(":").concat(String.valueOf(remoteHost));
-        return ConnectionsPoll.reconnect(key, remoteHost, remotePort);
+        Channel reconnect = ConnectionsPoll.reconnect(key, remoteHost, remotePort);
+
+        return reconnect;
     }
 }

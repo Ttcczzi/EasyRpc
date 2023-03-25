@@ -20,10 +20,14 @@ public class ConsumeApplication {
     @Resource
     private TestInterface testInterface;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ConfigurableApplicationContext run = SpringApplication.run(ConsumeApplication.class);
 
         ConsumeApplication consumeApplication = (ConsumeApplication) run.getBean("consumeApplication");
+
+        System.out.println(consumeApplication.testInterface.test("wt"));
+
+        Thread.sleep(60000);
 
         System.out.println(consumeApplication.testInterface.test("wt"));
     }

@@ -18,6 +18,8 @@ import com.rpc.proxy.threadpool.CallBackThreadPool;
 import com.rpc.register.api.RegistryService;
 import com.rpc.register.api.config.RegistryConfig;
 import com.rpc.register.factory.RegistryFacotry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date
  */
 public abstract class RpcConsume {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpcConsume.class);
     protected String regsitryAddress;
 
     protected String registryType;
@@ -43,7 +46,7 @@ public abstract class RpcConsume {
         this.regsitryAddress = regsitryAddress;
         this.registryType = registryType;
 
-        HeartBeatFixedTime heartBeatFixedTime = new HeartBeatFixedTime();
+        heartBeatFixedTime = new HeartBeatFixedTime();
         heartBeatFixedTime.start();
 
     }
@@ -121,12 +124,13 @@ public abstract class RpcConsume {
     }
 
     public static void close() {
+        LOGGER.warn("RpcConsume close");
+
         ConnectionsPoll.close();
 
         heartBeatFixedTime.end();
 
         CallBackThreadPool.shutdown();
-
     }
 
 

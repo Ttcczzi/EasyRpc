@@ -1,5 +1,8 @@
 package com.rpc.proxy.threadpool;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @date
  */
 public class CallBackThreadPool {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallBackThreadPool.class);
     public static ThreadPoolExecutor executor;
 
     static {
@@ -26,6 +30,7 @@ public class CallBackThreadPool {
     }
 
     public static void shutdown(){
+        LOGGER.warn("CallBackThreadPool shutdown");
         if (!executor.isShutdown()){
             executor.shutdown();
         }

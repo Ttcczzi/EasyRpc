@@ -72,14 +72,16 @@ public class HeartBeatFixedTime implements HeartBeat {
                     RpcProtocal<RpcMessage> protocal = new RpcProtocal<>();
 
                     for (String key : channelsPool.keySet()) {
-                        Channel channel = channelsPool.get(key);
+                        Channel channel = channelsPool.getOrDefault(key, null);
+                        if (channel != null && channel.isWritable()){
 
-                        HeartBeatMessage heartBeatMessage = new HeartBeatMessage("ping");
-                        heartBeatMessage.setChannelKey(key);
+                            HeartBeatMessage heartBeatMessage = new HeartBeatMessage("ping");
+                            heartBeatMessage.setChannelKey(key);
 
-                        protocal.setMessage(heartBeatMessage);
+                            protocal.setMessage(heartBeatMessage);
 
-                        sendHeartBeat( channel, protocal);
+                            sendHeartBeat( channel, protocal);
+                        }
                     }
                 }
                 , 30000, heartbeatInterval, TimeUnit.MILLISECONDS);
@@ -123,7 +125,10 @@ public class HeartBeatFixedTime implements HeartBeat {
     }
 
     public void end() {
-        heartBeattaskScheduler.shutdown();
+        LOGGER.warn("heartBeattaskScheduler Shutdown");
+        if(!heartBeattaskScheduler.isShutdown()){
+            heartBeattaskScheduler.shutdown();
+        }
     }
 
 
