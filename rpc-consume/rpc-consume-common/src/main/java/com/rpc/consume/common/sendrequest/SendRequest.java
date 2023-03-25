@@ -41,18 +41,20 @@ public class SendRequest implements Send {
 
     }
 
+    private SendRequest(Channel channel) {
+        this.channel = channel;
+    }
+
     private static ConcurrentHashMap<String, SendRequest> sendRequestPool = new ConcurrentHashMap();
     //private static HashMap<String, SendRequest> sendRequestPool = new HashMap();
 
     public static SendRequest instance(String host, int port) {
         String key = host.concat(":").concat(String.valueOf(port));
-        if (sendRequestPool.containsKey(key)) {
-            return sendRequestPool.get(key);
-        }
+//        if (sendRequestPool.containsKey(key)) {
+//            return sendRequestPool.get(key);
+//        }
 
-        SendRequest sendRequest = new SendRequest();
-        sendRequest.setChannel(ConnectionsPoll.getChannel(key, host, port));
-        sendRequestPool.putIfAbsent(key, sendRequest);
+        SendRequest sendRequest = sendRequestPool.computeIfAbsent(key, (a) ->new SendRequest(ConnectionsPoll.getChannel(key, host, port)));
 
         remoteHost = host;
         remotePort = port;

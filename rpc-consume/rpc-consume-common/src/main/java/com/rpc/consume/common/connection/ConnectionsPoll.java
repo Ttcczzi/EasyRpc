@@ -23,10 +23,12 @@ public class ConnectionsPoll   {
     private static ConcurrentHashMap<String, Channel> channelsPool = new ConcurrentHashMap<>();
 
     public static Channel getChannel(String key, String host, int port) {
-        if (channelsPool.containsKey(key)) {
-            return channelsPool.get(key);
-        }
-        Channel channel = tryConnect(key, host, port);
+//        if (channelsPool.containsKey(key)) {
+//            return channelsPool.get(key);
+//        }
+//        Channel channel = tryConnect(key, host, port);
+
+        Channel channel = channelsPool.computeIfAbsent(key, (a) -> tryConnect(key, host, port));
 
         return channel;
     }
@@ -35,12 +37,15 @@ public class ConnectionsPoll   {
         if(channelsPool.containsKey(channelKey)){
             Channel channel = channelsPool.remove(channelKey);
 
-            channel.close();
+            if(channel != null){
+                channel.close();
+            }
+
         }
     }
 
     public static void putChannel(String key, String host, int port, Channel channel){
-        channelsPool.put(key, channel);
+        channelsPool.putIfAbsent(key, channel);
     }
 
 
