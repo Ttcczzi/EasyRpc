@@ -120,8 +120,7 @@ public class SendRequest implements Send {
     public Channel reconnect() throws InterruptedException {
         //todo
         LOGGER.warn("the channel {}:{} try to reconnect", remoteHost, remotePort);
-        String key = remoteHost.concat(":").concat(String.valueOf(remoteHost));
-
+        String key = remoteHost.concat(":").concat(String.valueOf(remotePort));
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
         CountDownLatch nowCountDownLatch = ConnectionsPoll.getcountDownLatchs().computeIfAbsent(key, (k) -> countDownLatch);

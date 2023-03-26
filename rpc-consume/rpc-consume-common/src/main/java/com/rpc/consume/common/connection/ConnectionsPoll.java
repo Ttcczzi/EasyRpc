@@ -26,22 +26,25 @@ import java.util.concurrent.CountDownLatch;
  * @date
  */
 public class ConnectionsPoll {
-    private static int count = 20;
-
+    //private static int count = 20;
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionsPoll.class);
-
     private static ConcurrentHashMap<String, Channel> channelsPool = new ConcurrentHashMap<>();
-
     private static ConcurrentHashMap<String, CountDownLatch> countDownLatchs = new ConcurrentHashMap<>();
-
     private static Object lock = new Object();
 
+    //按时不需要考虑并发（对于相同host：port的主机进行重复连接）问题，该方法只有两种时机被调用，
+    //第一种，启动时，由于启动时只有主线程，所以线程安全
+    //第一种，重连时，由于重连机制在前面步骤已经考虑了并发问题，到这一步时已经不存在并发问题了
     public static Channel getChannel(String key, String host, int port) {
-        Channel channel = channelsPool.getOrDefault(key, tryConnect(key, host, port));
+        //getOrDefault需要先创建default
+        if(channelsPool.containsKey(key)){
+            return channelsPool.get(key);
+        }
+        LOGGER.info("null {}", Thread.currentThread().getName());
+        Channel channel = tryConnect(key, host, port);
 
         return channel;
     }
-
     public static void disconnect(String channelKey) {
         if (channelsPool.containsKey(channelKey)) {
             Channel channel = channelsPool.remove(channelKey);
@@ -53,16 +56,15 @@ public class ConnectionsPoll {
             }
         }
     }
-
     public static void putChannel(String key, String host, int port, Channel channel) {
         channelsPool.computeIfAbsent(key, (a) -> channel);
     }
-
-
     public static Channel reconnect(String key, String host, int port) throws InterruptedException {
         Channel channel = reconnect0(key, host, port);
         //putChannel(key, host, port, channel);
-        // 说明重连成功
+
+        //到这说明重连成功 -> 删除 countDownLatchs 里面的 CountDownLatch
+        LOGGER.info("reconnect successfully, {}", channel);
         CountDownLatch countDownLatch = countDownLatchs.remove(key);
         if(countDownLatch == null){
             throw new NullPointerException();
@@ -71,25 +73,17 @@ public class ConnectionsPoll {
 
         return channel;
     }
-
     public static ConcurrentHashMap<String, CountDownLatch> getcountDownLatchs() {
         return countDownLatchs;
     }
-
     public static ConcurrentHashMap<String, Channel> getChannelsPool() {
         return channelsPool;
     }
-
     static private NioEventLoopGroup group = new NioEventLoopGroup();
-
     static {
         group = new NioEventLoopGroup();
     }
-
     private static Channel tryConnect(String key, String host, int port) {
-//        if(channelsPool.size() > count){
-//            return null;
-//        }
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
         bootstrap.group(group);
@@ -109,6 +103,7 @@ public class ConnectionsPoll {
             return null;
         }
 
+        LOGGER.info("{} get a channel {}", Thread.currentThread().getName(), channel);
         return channel;
     }
 

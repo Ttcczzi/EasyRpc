@@ -17,7 +17,6 @@ public class ConnectionHandler extends ChannelInboundHandlerAdapter {
         this.host = host;
         this.port = port;
     }
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         LOGGER.info("{} 连接到服务", ctx.channel().toString());

@@ -109,7 +109,7 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
                 //服务名称
                 String serviceName = RpcServiceHelper.buildServiceKey(interfaceClassName, version, group);
                 //服务发现
-                //todo 扩展
+                //todo 扩展 负载均衡
                 ServiceMeta discover = registryImpl.discover(serviceName, 0);
 
                 if(discover == null){

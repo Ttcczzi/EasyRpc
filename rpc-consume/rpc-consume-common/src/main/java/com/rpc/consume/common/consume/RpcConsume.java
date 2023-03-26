@@ -33,14 +33,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class RpcConsume {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcConsume.class);
     protected String regsitryAddress;
-
     protected String registryType;
-
-
     protected static ProxyFactory proxyFactory = new JdkProxyFactory<>();
     //代理对象实例集合
     protected static ConcurrentHashMap<String, Object> proxyObjects = new ConcurrentHashMap<>();
-
     protected static HeartBeatFixedTime  heartBeatFixedTime;
     public RpcConsume(String regsitryAddress, String registryType) {
         this.regsitryAddress = regsitryAddress;
@@ -66,7 +62,6 @@ public abstract class RpcConsume {
             String serviceName = RpcServiceHelper.buildServiceKey(interfaceClass.getName(), referenceInfo.getVersion(), referenceInfo.getGroup());
             //远程服务的信息
             ServiceMeta discover = registryImpl.discover(serviceName, 0);
-
             //重置代理工厂的配置
             initConfig(new ProxyConfig(interfaceClass,
                     referenceInfo.getVersion(), referenceInfo.getGroup(),
