@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -51,27 +52,33 @@ public class HeartBeatFixedTime implements HeartBeat {
 
                     if(leftHeartBeatFutures.size() > 0){
                         for(RpcFuture future: leftHeartBeatFutures.values()){
-                            RpcProtocal<RpcMessage> requestRrotocal = future.getRequestRrotocal();
+                            if(!future.isDone()){
+                                RpcProtocal<RpcMessage> requestRrotocal = future.getRequestRrotocal();
 
-                            HeartBeatMessage message = (HeartBeatMessage) requestRrotocal.getMessage();
-                            String channelKey = message.getChannelKey();
+                                HeartBeatMessage message = (HeartBeatMessage) requestRrotocal.getMessage();
+                                String channelKey = message.getChannelKey();
 
-                            Integer count = defeatCount.put(channelKey, defeatCount.getOrDefault(channelKey, 0) + 1);
+                                //todo
+                                Integer count = defeatCount.put(channelKey, defeatCount.getOrDefault(channelKey, 0) + 1);
 
-                            if(count >= 3){
-                                LOGGER.error("the channel {} reconnect failed {} times", channelKey, count);
-                                ConnectionsPoll.disconnect(channelKey);
-                                defeatCount.remove(channelKey);
+                                if(count >= 3){
+                                    LOGGER.error("the channel {} reconnect failed {} times", channelKey, count);
+                                    ConnectionsPoll.disconnect(channelKey);
+                                    defeatCount.remove(channelKey);
+                                }
                             }
-
                         }
                     }
 
                     ConcurrentHashMap<String, Channel> channelsPool = ConnectionsPoll.getChannelsPool();
 
+                    ConcurrentHashMap.KeySetView<String, Channel> channelKeySetView = channelsPool.keySet();
+
+                    HashSet<String> keys = new HashSet<>(channelKeySetView);
+
                     RpcProtocal<RpcMessage> protocal = new RpcProtocal<>();
 
-                    for (String key : channelsPool.keySet()) {
+                    for (String key : keys) {
                         Channel channel = channelsPool.getOrDefault(key, null);
                         if (channel != null && channel.isWritable()){
 
@@ -80,11 +87,11 @@ public class HeartBeatFixedTime implements HeartBeat {
 
                             protocal.setMessage(heartBeatMessage);
 
-                            sendHeartBeat( channel, protocal);
+                            sendHeartBeat(channel, protocal);
                         }
                     }
                 }
-                , 30000, heartbeatInterval, TimeUnit.MILLISECONDS);
+                , heartbeatInterval, heartbeatInterval, TimeUnit.MILLISECONDS);
 
     }
 
@@ -105,7 +112,11 @@ public class HeartBeatFixedTime implements HeartBeat {
             }
         });
 
-        channel.writeAndFlush(protocal);
+        try{
+            channel.writeAndFlush(protocal);
+        }catch (Exception e){
+            LOGGER.error(e.getMessage());
+        }
     }
 
     public  RpcFuture createFuture(RpcProtocal<RpcMessage> protocal, AsyncCallback callback) {

@@ -16,10 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.SocketAddress;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 /**
  * 发送消息工具类
@@ -68,9 +65,8 @@ public class SendRequest implements Send {
         if (! channel.isWritable()){
             channel = reconnect();
         }
-        RpcFuture future = null;
+        RpcFuture future = future = createFuture(protocal, callback);
         try{
-            future = createFuture(protocal, callback);
             channel.writeAndFlush(protocal);
         }catch (Exception e){
             LOGGER.error(e.getMessage());
@@ -125,8 +121,18 @@ public class SendRequest implements Send {
         //todo
         LOGGER.warn("the channel {}:{} try to reconnect", remoteHost, remotePort);
         String key = remoteHost.concat(":").concat(String.valueOf(remoteHost));
-        Channel reconnect = ConnectionsPoll.reconnect(key, remoteHost, remotePort);
 
-        return reconnect;
+
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        CountDownLatch nowCountDownLatch = ConnectionsPoll.getcountDownLatchs().computeIfAbsent(key, (k) -> countDownLatch);
+
+        if(countDownLatch.equals(nowCountDownLatch)){
+            ConnectionsPoll.reconnect(key, remoteHost, remotePort);
+        }else{
+            // wait
+            nowCountDownLatch.wait();
+        }
+
+        return ConnectionsPoll.getChannel(key, remoteHost, remotePort);
     }
 }
