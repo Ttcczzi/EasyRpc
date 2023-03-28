@@ -125,7 +125,7 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
                 Object proxy = proxyFactory.getProxy(field.getType());
 
                 BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(RpcReferenceBean.class);
-                builder.setInitMethodName("init");
+                //builder.setInitMethodName("init");
                 //todo 扩展属性
                 builder.addPropertyValue("interfaceClass", field.getType());
                 builder.addPropertyValue("version", version);

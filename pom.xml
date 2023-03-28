@@ -16,6 +16,9 @@
         <module>rpc-proxy</module>
         <module>rpc-register</module>
         <module>rpc-spring-boot-starter</module>
+        <module>rpc-ratelimiter</module>
+        <module>rpc-ratelimiter/rpc-ratelimiter-common</module>
+        <module>rpc-ratelimiter/rpc-ratelimiter-strategies</module>
     </modules>
 
     <packaging>pom</packaging>

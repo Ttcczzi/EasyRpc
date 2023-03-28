@@ -9,6 +9,7 @@
         <module name="interfaces" />
         <module name="rpc-common" />
         <module name="rpc-serialization" />
+        <module name="rpc-ratelimiter" />
         <module name="rpc-spring-boot-provider" />
         <module name="rpc-provider-common" />
         <module name="rpc-proxy" />
@@ -17,9 +18,11 @@
         <module name="rpc-zclient" />
         <module name="rpc-consume-common" />
         <module name="rpc-consume-spring" />
+        <module name="rpc-ratelimiter-strategies" />
         <module name="rpc-provider-native" />
         <module name="rpc-provider-spring" />
         <module name="provider" />
+        <module name="rpc-ratelimiter-common" />
         <module name="rpc-annotation" />
         <module name="rpc-consume-native" />
         <module name="rpc-spring-boot-consume" />
