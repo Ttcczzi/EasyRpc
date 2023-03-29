@@ -2,10 +2,12 @@ package com.rpc.provider.common.msghandler;
 
 import com.rpc.common.constant.RpcConstants;
 import com.rpc.protocal.RpcProtocal;
+import com.rpc.protocal.enumeration.Messagetype;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.header.RpcHeaderFactory;
 import com.rpc.protocal.message.HeartBeatMessage;
 import com.rpc.protocal.message.ResponseMessage;
+import com.rpc.protocal.message.UltraLimitMessage;
 
 /**
  * 创建响应结果
@@ -41,8 +43,8 @@ public class RpcResponse {
         return protocal;
     }
 
-    public static RpcProtocal createHeartBeatProtocal(String serializationType, int msgType, Long requestId, String msg){
-        RpcHeader rpcHeader = RpcHeaderFactory.getRequestHeader(serializationType, msgType, requestId);
+    public static RpcProtocal createHeartBeatProtocal(String serializationType,  Long requestId, String msg){
+        RpcHeader rpcHeader = RpcHeaderFactory.getRequestHeader(serializationType, Messagetype.HEARTBEAT.getType(), requestId);
 
         HeartBeatMessage heartBeatMessage = new HeartBeatMessage();
         heartBeatMessage.setResult(msg);
@@ -52,5 +54,19 @@ public class RpcResponse {
         heartBeatMessageRpcProtocal.setMessage(heartBeatMessage);
 
         return heartBeatMessageRpcProtocal;
+    }
+
+
+    public static RpcProtocal createUltraLimitRpotocal(String serializationType, Long requestId){
+        RpcHeader rpcHeader = RpcHeaderFactory.getRequestHeader(serializationType, Messagetype.ULTRALIMIT.getType(), requestId);
+
+        UltraLimitMessage ultraLimitMessage = new UltraLimitMessage();
+        ultraLimitMessage.setError(RpcConstants.ULTRALIMIT_ERROR);
+
+        RpcProtocal<UltraLimitMessage> protocal = new RpcProtocal<>();
+        protocal.setHeader(rpcHeader);
+        protocal.setMessage(ultraLimitMessage);
+
+        return protocal;
     }
 }

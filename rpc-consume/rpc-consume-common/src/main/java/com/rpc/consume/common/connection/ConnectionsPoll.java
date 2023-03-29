@@ -40,12 +40,13 @@ public class ConnectionsPoll {
         if(channelsPool.containsKey(key)){
             return channelsPool.get(key);
         }
-        LOGGER.info("null {}", Thread.currentThread().getName());
+//        LOGGER.info("null {}", Thread.currentThread().getName());
         Channel channel = tryConnect(key, host, port);
 
         return channel;
     }
     public static void disconnect(String channelKey) {
+        LOGGER.warn("disconnect a channel, {} ", channelKey);
         if (channelsPool.containsKey(channelKey)) {
             Channel channel = channelsPool.remove(channelKey);
 

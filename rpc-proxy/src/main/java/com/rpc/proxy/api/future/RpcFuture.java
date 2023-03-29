@@ -5,6 +5,7 @@ import com.rpc.protocal.base.RpcMessage;
 import com.rpc.protocal.message.HeartBeatMessage;
 import com.rpc.protocal.message.RequestMessage;
 import com.rpc.protocal.message.ResponseMessage;
+import com.rpc.protocal.message.UltraLimitMessage;
 import com.rpc.proxy.api.callback.AsyncCallback;
 import com.rpc.proxy.threadpool.CallBackThreadPool;
 import org.slf4j.Logger;
@@ -121,7 +122,9 @@ public class RpcFuture extends CompletableFuture<Object> {
                 HeartBeatMessage heartBeatMessage = (HeartBeatMessage) responseRrotocal.getMessage();
                 return heartBeatMessage.getResult();
             }
-
+            if(message instanceof UltraLimitMessage){
+                return null;
+            }
         }
         return null;
     }
@@ -132,7 +135,9 @@ public class RpcFuture extends CompletableFuture<Object> {
         if (success) {
             return get0();
         } else {
-            throw new RuntimeException("time out, RequestId: " + requestRrotocal.getMessage());
+            LOGGER.warn("time out, RequestId: " + requestRrotocal.getHeader().getRequestId());
+            //throw new RuntimeException();
+            return null;
         }
     }
 
@@ -143,7 +148,7 @@ public class RpcFuture extends CompletableFuture<Object> {
         invokeCallBack();
         long processTime = System.currentTimeMillis() - startTime;
         if (processTime > responseTimeThrshould) {
-            LOGGER.warn("time out: " + responseRrotocal.getMessage());
+            LOGGER.warn("time out, RequestId: " + requestRrotocal.getHeader().getRequestId());
         }
     }
 

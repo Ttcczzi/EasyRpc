@@ -73,7 +73,7 @@ public class SendRequest implements Send {
             LOGGER.warn("reconnecting...");
         }
 
-        future.get(20, TimeUnit.SECONDS);
+        future.get(40, TimeUnit.SECONDS);
 
         return future;
     }

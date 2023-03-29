@@ -10,7 +10,9 @@ public enum Messagetype {
     //响应消息
     RESPONSE(2),
 
-    HEARTBEAT(3);
+    HEARTBEAT(3),
+
+    ULTRALIMIT(4);
 
     private final int type;
 

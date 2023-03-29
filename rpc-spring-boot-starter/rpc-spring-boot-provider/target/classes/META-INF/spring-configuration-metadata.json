@@ -8,18 +8,51 @@
   ],
   "properties": [
     {
-      "name": "easyrpc.provider.host",
-      "type": "java.lang.String",
+      "name": "easyrpc.provider.enable-limit",
+      "type": "java.lang.Boolean",
+      "description": "是否限流",
       "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
     },
     {
-      "name": "easyrpc.provider.register-type",
+      "name": "easyrpc.provider.host",
       "type": "java.lang.String",
+      "description": "本机地址",
+      "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
+    },
+    {
+      "name": "easyrpc.provider.limit-time",
+      "type": "java.lang.Long",
+      "description": "限流时间",
+      "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
+    },
+    {
+      "name": "easyrpc.provider.permites",
+      "type": "java.lang.Integer",
+      "description": "流量数量",
+      "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
+    },
+    {
+      "name": "easyrpc.provider.port",
+      "type": "java.lang.String",
+      "description": "本机端口",
+      "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
+    },
+    {
+      "name": "easyrpc.provider.rate-limiter-type",
+      "type": "java.lang.String",
+      "description": "限流方式",
+      "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
+    },
+    {
+      "name": "easyrpc.provider.registry-type",
+      "type": "java.lang.String",
+      "description": "注册中心类型",
       "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
     },
     {
       "name": "easyrpc.provider.regsitry-address",
       "type": "java.lang.String",
+      "description": "注册中心地址",
       "sourceType": "com.rpc.springboot.provider.autoconfig.RpcSpringServerAutoConfig"
     }
   ],

@@ -14,6 +14,11 @@ public class CountRateLimiter extends AbstractRateLimiter {
     private AtomicInteger countPermits = new AtomicInteger();
 
     private long lastTimeStamp = System.currentTimeMillis();
+
+    public CountRateLimiter(int permites, long limitTime) {
+        super(permites, limitTime);
+    }
+
     @Override
     public boolean tryAcquire() {
         long currentTimeStamp = System.currentTimeMillis();

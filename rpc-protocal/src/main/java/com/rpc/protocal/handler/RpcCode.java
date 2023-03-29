@@ -9,6 +9,7 @@ import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.message.HeartBeatMessage;
 import com.rpc.protocal.message.RequestMessage;
 import com.rpc.protocal.message.ResponseMessage;
+import com.rpc.protocal.message.UltraLimitMessage;
 import com.rpc.serializatiion.Serialization;
 import com.rpc.serializatiion.SerializationFactory;
 import com.rpc.serializatiion.exeception.SerializationException;
@@ -138,6 +139,17 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
 
                     out.add(protocal);
                 }
+                break; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            case ULTRALIMIT:
+                UltraLimitMessage ultraLimitMessage = serialization.deserilize(data, UltraLimitMessage.class);
+                if(ultraLimitMessage != null){
+                    RpcProtocal<UltraLimitMessage> protocal = new RpcProtocal<>();
+                    protocal.setHeader(rpcHeader);
+                    protocal.setMessage(ultraLimitMessage);
+
+                    out.add(protocal);
+                }
+                break;
             default:
                 break;
         }

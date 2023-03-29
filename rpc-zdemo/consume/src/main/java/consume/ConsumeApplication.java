@@ -27,8 +27,10 @@ public class ConsumeApplication {
 
         System.out.println(consumeApplication.testInterface.test("wt"));
 
-        Thread.sleep(60000);
+        Thread.sleep(1000);
 
         System.out.println(consumeApplication.testInterface.test("wt"));
+        System.out.println(consumeApplication.testInterface.test("wt"));
+        //System.out.println(consumeApplication.testInterface.test("wt"));
     }
 }

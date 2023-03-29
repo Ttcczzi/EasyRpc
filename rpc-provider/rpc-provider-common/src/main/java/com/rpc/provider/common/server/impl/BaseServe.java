@@ -4,6 +4,8 @@ import com.rpc.protocal.handler.RpcCode;
 import com.rpc.provider.common.handler.ConnectionHandler;
 import com.rpc.provider.common.handler.RpcProviderHandler;
 import com.rpc.provider.common.server.api.Server;
+import com.rpc.ratelimiter.common.contants.RateLimiterConstants;
+import com.rpc.ratelimiter.strategies.factory.RateLimiterFactory;
 import com.rpc.register.api.RegistryService;
 import com.rpc.register.api.config.RegistryConfig;
 import com.rpc.register.factory.RegistryFacotry;
@@ -26,10 +28,13 @@ public class BaseServe implements Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseServe.class);
     protected String host = "127.0.0.1";
     protected int port = 9999;
+    private boolean enableLimit = true;
+    private int permites = 1000;
+    private long limitTime = 2000;
+    private String rateLimiterType = RateLimiterConstants.RL_TOKEN;
     private ServerBootstrap bootstrap;
     private NioEventLoopGroup boss;
     private NioEventLoopGroup work;
-
     protected RegistryService registryService;
     protected Map<String, Object> handlermap = new HashMap<>();
 
@@ -41,16 +46,19 @@ public class BaseServe implements Server {
         this.registryService = RegistryFacotry.getRegistryImpl(registryConfig);
     }
 
-    public BaseServe(String host, int port, RegistryConfig registryConfig) throws Exception {
+    public BaseServe(String host, int port, RegistryConfig registryConfig, boolean enableLimit, int permites, long limitTime, String rateLimiterType) throws Exception {
         this(registryConfig);
         this.host = host;
         this.port = port;
+        this.enableLimit = enableLimit;
+        this.permites = permites;
+        this.limitTime = limitTime;
+        this.rateLimiterType = rateLimiterType;
     }
 
     @Override
     public void startNettyServe() {
         new Thread(() -> {
-
             boss = new NioEventLoopGroup();
             work = new NioEventLoopGroup();
             try {
@@ -63,7 +71,7 @@ public class BaseServe implements Server {
                                 channel.pipeline().addLast(new RpcCode());
                                 //入站
                                 channel.pipeline().addLast(new ConnectionHandler());
-                                channel.pipeline().addLast(new RpcProviderHandler(handlermap, host, port));
+                                channel.pipeline().addLast(new RpcProviderHandler(handlermap, host, port, enableLimit, RateLimiterFactory.getRateLimiter(enableLimit, permites, limitTime, rateLimiterType)));
                             }
                         })
                         .option(ChannelOption.SO_BACKLOG, 128)

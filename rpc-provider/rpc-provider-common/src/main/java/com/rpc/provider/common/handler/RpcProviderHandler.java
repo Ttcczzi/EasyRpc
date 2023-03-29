@@ -1,11 +1,14 @@
 package com.rpc.provider.common.handler;
 
+import com.rpc.common.constant.RpcConstants;
 import com.rpc.protocal.RpcProtocal;
 import com.rpc.protocal.enumeration.Messagetype;
 import com.rpc.protocal.header.RpcHeader;
 import com.rpc.protocal.message.HeartBeatMessage;
 import com.rpc.protocal.message.RequestMessage;
 import com.rpc.provider.common.msghandler.MsgHandler;
+import com.rpc.provider.common.msghandler.RpcResponse;
+import com.rpc.ratelimiter.common.api.InvokeRateLimiter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -29,10 +32,19 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocal<
 
     private int port;
 
-    public RpcProviderHandler(Map map, String host, int port){
+    private boolean enableRateLimit = true;
+
+    private InvokeRateLimiter rateLimiter;
+
+    public RpcProviderHandler(Map map, String host, int port, boolean enableRateLimit, InvokeRateLimiter rateLimiter) {
         this.handlermap = map;
         this.host = host;
         this.port = port;
+
+        this.enableRateLimit = enableRateLimit;
+        this.rateLimiter = rateLimiter;
+
+        LOGGER.info("ratelimiter is loaded？{}, {}",enableRateLimit, rateLimiter);
     }
 
 
@@ -44,13 +56,19 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocal<
         byte msgType = header.getMsgType();
         Object message = protocal.getMessage();
 
-        if(msgType == Messagetype.REQUEST.getType() && message instanceof RequestMessage){
+        //限流
+        if (enableRateLimit && msgType == Messagetype.REQUEST.getType()) {
+            if (!rateLimiter.tryAcquire()) {
+               MsgHandler.handlerUltraLimter(ctx, header);
+            }
+        }
+
+        if (msgType == Messagetype.REQUEST.getType() && message instanceof RequestMessage) {
             MsgHandler.handlerRequestMessage(ctx, (RequestMessage) message, protocal.getHeader(), header.getRequestId(), handlermap);
-        }else if(msgType == Messagetype.HEARTBEAT.getType() && message instanceof HeartBeatMessage){
+        } else if (msgType == Messagetype.HEARTBEAT.getType() && message instanceof HeartBeatMessage) {
             MsgHandler.handlerHeartBeatMessage(ctx, (HeartBeatMessage) message, protocal.getHeader(), host, port);
         }
     }
-
 
 
 }

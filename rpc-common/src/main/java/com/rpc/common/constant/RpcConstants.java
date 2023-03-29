@@ -15,4 +15,6 @@ public class RpcConstants {
     public static final String PROTOSTUFFSERIALIZATION = "protostuff";
     public static final String PROVIDER_ERROR = "privoder error";
     public static final String PROVIDER_SUCCESS = "privoder success";
+
+    public static final String ULTRALIMIT_ERROR = "frequent requests";
 }

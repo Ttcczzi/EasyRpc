@@ -3,6 +3,7 @@ com\rpc\provider\common\server\impl\BaseServe.class
 com\rpc\provider\common\server\api\Server.class
 com\rpc\provider\common\invokeways\ReflactWay.class
 com\rpc\provider\common\msghandler\RpcResponse.class
+com\rpc\provider\common\handler\RpcRateLimiterHandler.class
 com\rpc\provider\common\msghandler\MsgHandler.class
 com\rpc\provider\common\server\impl\BaseServe$1.class
 com\rpc\provider\common\handler\RpcProviderHandler.class

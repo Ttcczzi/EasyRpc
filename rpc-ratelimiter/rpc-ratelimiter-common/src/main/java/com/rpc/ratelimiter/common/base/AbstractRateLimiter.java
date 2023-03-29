@@ -12,8 +12,17 @@ public abstract class AbstractRateLimiter implements InvokeRateLimiter {
 
     protected long limitTime;
 
-    public void init(int permites, int limitTime){
+    public AbstractRateLimiter(int permites, long limitTime){
         this.permites = permites;
         this.limitTime = limitTime;
+    }
+
+    @Override
+    public String toString() {
+        return "AbstractRateLimiter{" +
+                "permites=" + permites +
+                ", limitTime=" + limitTime +
+                ", type=" + this.getClass() +
+                '}';
     }
 }

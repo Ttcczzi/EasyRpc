@@ -1,3 +1,5 @@
 easyrpc:
   provider:
     host: 127.0.0.1
+    permites: 1
+    limit-time: 20000

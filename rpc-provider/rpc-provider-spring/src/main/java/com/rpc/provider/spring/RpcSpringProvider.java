@@ -23,8 +23,8 @@ import java.util.Map;
 public class  RpcSpringProvider extends BaseServe implements ApplicationContextAware, InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcSpringProvider.class);
 
-    public RpcSpringProvider(String host, int port, String registerAddress, String registerType) throws Exception {
-        super(host, port, new RegistryConfig(registerAddress, registerType));
+    public RpcSpringProvider(String host, int port, String registerAddress, String registerType, boolean enableLimiter, int permites, long limiteTime, String rateLimiterType) throws Exception {
+        super(host, port, new RegistryConfig(registerAddress, registerType), enableLimiter, permites, limiteTime, rateLimiterType);
     }
 
     @Override
@@ -40,9 +40,9 @@ public class  RpcSpringProvider extends BaseServe implements ApplicationContextA
                 RpcService rpcService = bean.getClass().getAnnotation(RpcService.class);
 
                 if (rpcService != null) {
-                    LOGGER.info(bean.getClass().getName() + "=============================");
-                    LOGGER.info(rpcService.interfaceClass().toString());
-                    LOGGER.info(rpcService.interfaceName());
+//                    LOGGER.info(bean.getClass().getName() + "=============================");
+//                    LOGGER.info(rpcService.interfaceClass().toString());
+//                    LOGGER.info(rpcService.interfaceName());
 
                     Class<?> interfaceClass = rpcService.interfaceClass();
 

@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 令牌桶
  * @author xcx
  * @date
  */
@@ -23,6 +24,10 @@ public class BucketRateLimiter extends AbstractRateLimiter {
         outTime = 60 * 1000;
         executor = new ScheduledThreadPoolExecutor(1);
         executor.scheduleAtFixedRate(new TokenIncreaseTask(), 0, limitTime, TimeUnit.MILLISECONDS);
+    }
+
+    public BucketRateLimiter(int permites, long limitTime) {
+        super(permites, limitTime);
     }
 
 
