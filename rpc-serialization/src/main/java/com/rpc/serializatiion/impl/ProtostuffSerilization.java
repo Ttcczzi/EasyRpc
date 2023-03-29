@@ -45,7 +45,7 @@ public enum ProtostuffSerilization implements Serialization {
     }
     //反序列化方法，将字节数组反序列化成指定Class类型
     public <T> T deserilize(byte[] data, Class<T> clazz) {
-        LOGGER.info("protostuff deserilize");
+        LOGGER.info("protostuff deserilize {}", clazz);
         Schema<T> schema = getSchema(clazz);
         T obj = schema.newMessage();
         ProtostuffIOUtil.mergeFrom(data, obj, schema);

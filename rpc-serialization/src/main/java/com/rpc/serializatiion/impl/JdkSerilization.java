@@ -37,7 +37,7 @@ public enum JdkSerilization implements Serialization {
 
     @Override
     public <T> T deserilize(byte[] bytes, Class<T> tClass) {
-        LOGGER.info("JdkSerilization deserilize");
+        LOGGER.info("JdkSerilization deserilize, {}", tClass);
         if(bytes == null || bytes.length <= 0){
             throw new SerializationException("字节数组为空");
         }
