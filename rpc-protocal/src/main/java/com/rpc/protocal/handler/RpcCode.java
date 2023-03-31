@@ -111,7 +111,6 @@ public class RpcCode extends ByteToMessageCodec<RpcProtocal<Object>> implements 
 
         switch (msgTypeEnum){
             case REQUEST:
-
                 RequestMessage requestMessage = serialization.deserilize(data, RequestMessage.class);
                 if(requestMessage != null){
                     RpcProtocal<RequestMessage> protocal = new RpcProtocal<>();
