@@ -31,6 +31,7 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * @author xcx
@@ -73,6 +74,7 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        //获得所有的BeanDefination，判断里面的属性有没有@RpcReference注解
         String[] names = beanFactory.getBeanDefinitionNames();
 
         for(String beanName: names){
@@ -85,6 +87,7 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
             }
         }
 
+        //将生成的代理对象所对应的BeanDefinatin注册到BeanFactory中，以用于后面的Bean的实例化与初始化
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
         this.rpcRefBeanDefinitionMap.forEach((beanName, beanDefinition) -> {
             if(this.applicationContext.containsBean(beanName)){
@@ -98,9 +101,9 @@ public class RpcSpringComsume extends RpcConsume implements ApplicationContextAw
     }
 
     private void filedsHandler(Field field)  {
+
         try {
             RpcReference annotation = field.getAnnotation(RpcReference.class);
-
 
             if (annotation != null){
                 String interfaceClassName = field.getType().getName();

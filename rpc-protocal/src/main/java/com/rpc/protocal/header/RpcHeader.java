@@ -95,6 +95,12 @@ public class RpcHeader implements Serializable {
         this.msgLen = msgLen;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "RpcHeader{" +
+                "requestId=" + requestId +
+                ", msgType=" + msgType +
+                ", serializationType='" + serializationType + '\'' +
+                '}';
+    }
 }

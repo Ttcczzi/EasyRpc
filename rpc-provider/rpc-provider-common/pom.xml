@@ -11,6 +11,9 @@
 
     <artifactId>rpc-provider-common</artifactId>
     <dependencies>
+
+
+
         <dependency>
             <groupId>com.wt</groupId>
             <artifactId>rpc-register</artifactId>

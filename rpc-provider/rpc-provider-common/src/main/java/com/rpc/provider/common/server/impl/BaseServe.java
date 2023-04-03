@@ -14,6 +14,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ import java.util.Map;
 public class BaseServe implements Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseServe.class);
     protected String host = "127.0.0.1";
-    protected int port = 9999;
+    protected int port = 1106;
     private boolean enableLimit = true;
     private int permites = 1000;
     private long limitTime = 2000;
@@ -68,6 +69,8 @@ public class BaseServe implements Server {
                         .childHandler(new ChannelInitializer<NioSocketChannel>() {
                             @Override
                             protected void initChannel(NioSocketChannel channel) throws Exception {
+                                //单个包的最大长度，偏移几个字节是长度域，长度域占几个字节，
+                                channel.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,28,4,0,0));
                                 channel.pipeline().addLast(new RpcCode());
                                 //入站
                                 channel.pipeline().addLast(new ConnectionHandler());

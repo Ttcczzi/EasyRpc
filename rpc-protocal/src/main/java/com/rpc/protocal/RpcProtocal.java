@@ -32,4 +32,11 @@ public class RpcProtocal<T> implements Serializable {
         this.message = message;
     }
 
+    @Override
+    public String toString() {
+        return "RpcProtocal{" +
+                "header=" + header +
+                ", message=" + message +
+                '}';
+    }
 }
